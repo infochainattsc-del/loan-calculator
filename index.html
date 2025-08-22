@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<title>โปรแกรมคำนวณสินเชื่อ</title>
+<style>
+  body { font-family: sans-serif; padding: 20px; max-width: 800px; margin: auto; background: #f9f9f9; }
+  label { display: inline-block; width: 200px; }
+  input { background-color: #fff; padding: 5px; border: 1px solid #ccc; border-radius: 4px; }
+  input.red { color: red; font-weight: bold; }
+  button { padding: 10px 20px; font-size: 16px; margin-top: 10px; }
+  button:disabled { background-color: #ccc; cursor: not-allowed; }
+  .result { margin-top: 30px; }
+  .status-bar { width: 100%; background-color: #eee; border-radius: 4px; height: 16px; margin-top: 5px; }
+  .status-fill { height: 16px; border-radius: 4px; }
+  p.gray { font-size: 12px; color: gray; }
+  p.warning { color: red; font-weight: bold; display: none; }
+</style>
+</head>
+<body>
+
+<h1>สหกรณ์ออมทรัพย์ครูชัยนาท จำกัด</h1>
+<h1>โปรแกรมคำนวณสินเชื่อ (ด้วยตนเอง)</h1>
+
+<div><label>วงเงินกู้ :</label><input id="loanAmount" type="text" value="0"></div><br>
+<div><label>อัตราดอกเบี้ย (ต่อปี) :</label><input id="interestRate" type="number" value="5"></div><br>
+<div>
+  <label>เงินต้นที่ต้องการส่งต่อเดือน :</label>
+  <input id="monthlyPrincipal" type="text" value="0">
+  <p class="gray">* ระบบจะปรับเป็นจำนวนเต็ม</p>
+</div><br>
+<div>
+  <label>จำนวนงวด (สูงสุด 240) :</label>
+  <input id="installments" type="number" readonly>
+  <p class="gray">จำนวนงวดส่ง ไม่เกิน 240 งวด (สมาชิกใหม่ 150 งวด)</p>
+  <p id="warningMsg" class="warning">❌ จำนวนงวดเกิน 240 ไม่สามารถคำนวณได้</p>
+</div><br>
+<div><label>รายได้ต่อเดือน :</label><input id="income" type="text" value="0"></div><br>
+<div><label>ค่าใช้จ่ายต่อเดือน :</label><input id="expense" type="text" value="0"></div><br>
+
+<button id="calcBtn" onclick="calculateLoan()">คำนวณ</button>
+
+<div class="result" id="resultDiv"></div>
+
+<script>
+function formatNumber(value) {
+  return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
+
+function parseNumber(value) {
+  return parseFloat(value.replace(/,/g,'')) || 0;
+}
+
+// อัปเดตจำนวนงวดตามเงินต้นที่กรอก (ปัดเป็นจำนวนเต็ม)
+function updateMonthlyPrincipal() {
+  let loanAmount = parseNumber(document.getElementById('loanAmount').value);
+  let monthlyPrincipalInput = document.getElementById('monthlyPrincipal');
+  let installmentsInput = document.getElementById('installments');
+  let warningMsg = document.getElementById('warningMsg');
+
+  let monthlyPrincipal = parseNumber(monthlyPrincipalInput.value);
+  if(monthlyPrincipal <= 0) return;
+
+  // ปัดเงินต้นเป็นจำนวนเต็ม
+  monthlyPrincipal = Math.round(monthlyPrincipal);
+  monthlyPrincipalInput.value = formatNumber(monthlyPrincipal);
+
+  let calcInstallments = Math.ceil(loanAmount / monthlyPrincipal);
+  installmentsInput.value = calcInstallments;
+
+  if(calcInstallments > 240){
+    document.getElementById('calcBtn').disabled = true;
+    warningMsg.style.display = 'block';
+    installmentsInput.classList.add('red');
+  } else {
+    document.getElementById('calcBtn').disabled = false;
+    warningMsg.style.display = 'none';
+    installmentsInput.classList.remove('red');
+  }
+}
+
+// auto format + update
+['loanAmount','income','expense','monthlyPrincipal'].forEach(id=>{
+  document.getElementById(id).addEventListener('input', function(e){
+    let value = parseNumber(e.target.value);
+    e.target.value = formatNumber(value);
+    if(id === 'monthlyPrincipal' || id === 'loanAmount'){
+      updateMonthlyPrincipal();
+    }
+  });
+});
+
+function calculateLoan() {
+  let loanAmount = parseNumber(document.getElementById('loanAmount').value);
+  let interestRate = parseFloat(document.getElementById('interestRate').value);
+  let income = parseNumber(document.getElementById('income').value);
+  let expense = parseNumber(document.getElementById('expense').value);
+  let monthlyPrincipal = parseNumber(document.getElementById('monthlyPrincipal').value);
+
+  if(monthlyPrincipal <= 0) monthlyPrincipal = Math.round(loanAmount / 150);
+
+  let calcInstallments = Math.ceil(loanAmount / monthlyPrincipal);
+  if(calcInstallments > 240) return;
+  document.getElementById('installments').value = calcInstallments;
+
+  let balance = loanAmount, totalInterest = 0, actualInstallments = 0;
+  for(let i=1;i<=calcInstallments;i++){
+    let interest = Math.round((balance * (interestRate/100)*30)/365);
+    let principal = Math.min(monthlyPrincipal, balance);
+    balance -= principal;
+    totalInterest += interest;
+    actualInstallments++;
+    if(balance<=0) break;
+  }
+
+  let totalPayment = loanAmount + totalInterest;
+  let monthlyPayment = monthlyPrincipal + (totalInterest/actualInstallments);
+  let interest31 = Math.round((loanAmount * (interestRate/100)*31)/365);
+  let net = income - expense - monthlyPayment;
+  let remainPct = income>0 ? (net/income)*100 : 0;
+  let minRemain = income * 0.3;
+  let status = net >= minRemain;
+
+  let resultDiv = document.getElementById('resultDiv');
+  resultDiv.innerHTML = `
+    <h3>สรุปผลการคำนวณ</h3>
+    <p>วงเงินกู้ : ${loanAmount.toLocaleString()} บาท</p>
+    <p>จำนวนงวดที่ต้องส่ง : ${actualInstallments.toLocaleString()} งวด</p>
+    <p>ส่งต้น ต่อเดือน : ${monthlyPrincipal.toLocaleString()} บาท</p>
+    <p>ดอกเบี้ย ต่อเดือน (คำนวณ 31 วัน) : ${interest31.toLocaleString()} บาท</p>
+    <p>ต้องส่งชำระต่อเดือน : ${(monthlyPrincipal+interest31).toLocaleString()} บาท</p>
+
+    <p>รายได้คงเหลือ : ${net.toLocaleString()} บาท (${remainPct.toFixed(2)}%)</p>
+    <p style="color:${status?'green':'red'}; font-weight:bold;">
+      ${status?'เป็นไปตามเกณฑ์':'ไม่เป็นไปตามเกณฑ์ (ปรึกษาฝ่ายสินเชื่อ)'}
+    </p>
+    <div class="status-bar"><div class="status-fill" style="width:${Math.max(0, Math.min(100,remainPct))}%; background-color:${status?'green':'red'};"></div></div>
+    <p>รายได้ที่ต้องเหลือขั้นต่ำ 30% : ${minRemain.toLocaleString()} บาท</p>
+
+        <p>**หมายเหตุ : เป็นการคำนวณเบื้องต้น กรุณาติดต่อเจ้าหน้าที่เพื่อความถูกต้องอีกครั้ง</p>
+  `;
+}
+</script>
+
+</body>
+</html>
