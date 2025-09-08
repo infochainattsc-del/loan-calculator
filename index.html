@@ -8,139 +8,194 @@
   label { display: inline-block; width: 200px; }
   input { background-color: #fff; padding: 5px; border: 1px solid #ccc; border-radius: 4px; }
   input.red { color: red; font-weight: bold; }
-  button { padding: 10px 20px; font-size: 16px; margin-top: 10px; }
+  button { padding: 10px 20px; font-size: 16px; margin-top: 10px; cursor: pointer; }
   button:disabled { background-color: #ccc; cursor: not-allowed; }
   .result { margin-top: 30px; }
   .status-bar { width: 100%; background-color: #eee; border-radius: 4px; height: 16px; margin-top: 5px; }
   .status-fill { height: 16px; border-radius: 4px; }
   p.gray { font-size: 12px; color: gray; }
   p.warning { color: red; font-weight: bold; display: none; }
+  
+  /* โลโก้ใหญ่ตรงกลางหน้าจอ */
+  .logo-center { text-align: center; margin-bottom: 20px; }
+  .logo-center img { width: 100px; }
+
+  /* --- Print Mode --- */
+  @media print {
+    body { background: #fff; }
+    input, button, .gray, .warning, h2 { display: none !important; }
+    .logo-center { display: none !important; }
+    .print-header { display: block !important; margin-bottom: 20px; text-align: center; }
+    .print-header img { width: 120px; display: block; margin: 0 auto 10px auto; }
+    .print-header h1 { margin: 0; font-size: 22px; display: block; }
+    .status-bar { border: 1px solid #000; }
+  }
+
+  .print-header { display: none; text-align: center; }
 </style>
 </head>
 <body>
 
-<h1>สหกรณ์ออมทรัพย์ครูชัยนาท จำกัด</h1>
-<h1>โปรแกรมคำนวณสินเชื่อ (ด้วยตนเอง)</h1>
+<!-- โลโก้ใหญ่ตรงกลางหน้าจอ -->
+<div class="logo-center">
+  <img src="https://www.chainattsc.com/mediafiles/coop/logo/logo300.png" alt="โลโก้สหกรณ์">
+  <h2>สหกรณ์ออมทรัพย์ครูชัยนาท จำกัด</h2>
+</div>
 
-<div><label>วงเงินกู้ :</label><input id="loanAmount" type="text" value="0"></div><br>
-<div><label>อัตราดอกเบี้ย (ต่อปี) :</label><input id="interestRate" type="number" value="5"></div><br>
+<h2>โปรแกรมคำนวณสินเชื่อ (ด้วยตนเอง)</h2>
+
+<div>
+  <label>เลขทะเบียนสมาชิก (6 หลัก) :</label>
+  <input id="memberId" type="text" maxlength="6" placeholder="เช่น 009080">
+</div><br>
+
+<div>
+  <label>ชื่อ - นามสกุล :</label>
+  <input id="fullName" type="text" placeholder="กรอกชื่อ-นามสกุล">
+</div><br>
+
+<div>
+  <label>วงเงินกู้ :</label>
+  <input id="loanAmount" type="text" value="0">
+</div><br>
+
+<div>
+  <label>อัตราดอกเบี้ย (ต่อปี) :</label>
+  <input id="interestRate" type="number" value="5">
+</div><br>
+
 <div>
   <label>เงินต้นที่ต้องการส่งต่อเดือน :</label>
   <input id="monthlyPrincipal" type="text" value="0">
   <p class="gray">* ระบบจะปรับเป็นจำนวนเต็ม</p>
 </div><br>
+
 <div>
   <label>จำนวนงวด (สูงสุด 240) :</label>
   <input id="installments" type="number" readonly>
   <p class="gray">จำนวนงวดส่ง ไม่เกิน 240 งวด (สมาชิกใหม่ 150 งวด)</p>
   <p id="warningMsg" class="warning">❌ จำนวนงวดเกิน 240 ไม่สามารถคำนวณได้</p>
 </div><br>
-<div><label>รายได้ต่อเดือน :</label><input id="income" type="text" value="0"></div><br>
-<div><label>ค่าใช้จ่ายต่อเดือน :</label><input id="expense" type="text" value="0"></div><br>
+
+<div>
+  <label>รายได้ต่อเดือน :</label>
+  <input id="income" type="text" value="0">
+</div><br>
+
+<div>
+  <label>ค่าใช้จ่ายต่อเดือน :</label>
+  <input id="expense" type="text" value="0">
+</div><br>
 
 <button id="calcBtn" onclick="calculateLoan()">คำนวณ</button>
+<button id="printBtn" onclick="window.print()" style="display:none;">พิมพ์เอกสาร (A4)</button>
+
+<!-- ส่วนหัวกระดาษสำหรับ Print -->
+<div class="print-header">
+  <img src="https://www.chainattsc.com/mediafiles/coop/logo/logo300.png" alt="โลโก้สหกรณ์">
+  <h1>สหกรณ์ออมทรัพย์ครูชัยนาท จำกัด</h1>
+  <hr>
+</div>
 
 <div class="result" id="resultDiv"></div>
 
 <script>
-function formatNumber(value) {
-  return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+// จัดเลขสมาชิก 6 หลักอัตโนมัติ
+function formatMemberId() {
+  const input = document.getElementById("memberId");
+  let v = input.value.replace(/\D/g, "");
+  if (v.length > 0) v = v.padStart(6, "0");
+  input.value = v;
 }
+document.getElementById("memberId").addEventListener("blur", formatMemberId);
+document.getElementById("memberId").addEventListener("keypress", e => { if(e.key==="Enter") formatMemberId(); });
 
-function parseNumber(value) {
-  return parseFloat(value.replace(/,/g,'')) || 0;
-}
+function formatNumber(value) { return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","); }
+function parseNumber(value) { return parseFloat(value.replace(/,/g,'')) || 0; }
 
-// อัปเดตจำนวนงวดตามเงินต้นที่กรอก (ปัดเป็นจำนวนเต็ม)
 function updateMonthlyPrincipal() {
-  let loanAmount = parseNumber(document.getElementById('loanAmount').value);
-  let monthlyPrincipalInput = document.getElementById('monthlyPrincipal');
-  let installmentsInput = document.getElementById('installments');
-  let warningMsg = document.getElementById('warningMsg');
-
-  let monthlyPrincipal = parseNumber(monthlyPrincipalInput.value);
-  if(monthlyPrincipal <= 0) return;
-
-  // ปัดเงินต้นเป็นจำนวนเต็ม
-  monthlyPrincipal = Math.round(monthlyPrincipal);
-  monthlyPrincipalInput.value = formatNumber(monthlyPrincipal);
-
-  let calcInstallments = Math.ceil(loanAmount / monthlyPrincipal);
-  installmentsInput.value = calcInstallments;
-
-  if(calcInstallments > 240){
+  const loan = parseNumber(document.getElementById('loanAmount').value);
+  const mpInput = document.getElementById('monthlyPrincipal');
+  const instInput = document.getElementById('installments');
+  const warn = document.getElementById('warningMsg');
+  let mp = parseNumber(mpInput.value);
+  if (mp <= 0) return;
+  mp = Math.round(mp);
+  mpInput.value = formatNumber(mp);
+  const ci = Math.ceil(loan / mp);
+  instInput.value = ci;
+  if (ci > 240) {
     document.getElementById('calcBtn').disabled = true;
-    warningMsg.style.display = 'block';
-    installmentsInput.classList.add('red');
+    warn.style.display = 'block';
+    instInput.classList.add('red');
   } else {
     document.getElementById('calcBtn').disabled = false;
-    warningMsg.style.display = 'none';
-    installmentsInput.classList.remove('red');
+    warn.style.display = 'none';
+    instInput.classList.remove('red');
   }
 }
 
-// auto format + update
-['loanAmount','income','expense','monthlyPrincipal'].forEach(id=>{
-  document.getElementById(id).addEventListener('input', function(e){
-    let value = parseNumber(e.target.value);
-    e.target.value = formatNumber(value);
-    if(id === 'monthlyPrincipal' || id === 'loanAmount'){
-      updateMonthlyPrincipal();
-    }
-  });
-});
+['loanAmount','income','expense','monthlyPrincipal'].forEach(id =>
+  document.getElementById(id).addEventListener('input', e => {
+    const v = parseNumber(e.target.value);
+    e.target.value = formatNumber(v);
+    if (id === 'loanAmount' || id === 'monthlyPrincipal') updateMonthlyPrincipal();
+  })
+);
 
 function calculateLoan() {
-  let loanAmount = parseNumber(document.getElementById('loanAmount').value);
-  let interestRate = parseFloat(document.getElementById('interestRate').value);
-  let income = parseNumber(document.getElementById('income').value);
-  let expense = parseNumber(document.getElementById('expense').value);
-  let monthlyPrincipal = parseNumber(document.getElementById('monthlyPrincipal').value);
+  const memberId = document.getElementById('memberId').value || "-";
+  const fullName = document.getElementById('fullName').value || "-";
+  const loan = parseNumber(document.getElementById('loanAmount').value);
+  const rate = parseFloat(document.getElementById('interestRate').value);
+  const income = parseNumber(document.getElementById('income').value);
+  const expense = parseNumber(document.getElementById('expense').value);
+  let mp = parseNumber(document.getElementById('monthlyPrincipal').value);
+  if (mp <= 0) mp = Math.round(loan / 150);
+  const ci = Math.ceil(loan / mp);
+  if (ci > 240) return;
+  document.getElementById('installments').value = ci;
 
-  if(monthlyPrincipal <= 0) monthlyPrincipal = Math.round(loanAmount / 150);
-
-  let calcInstallments = Math.ceil(loanAmount / monthlyPrincipal);
-  if(calcInstallments > 240) return;
-  document.getElementById('installments').value = calcInstallments;
-
-  let balance = loanAmount, totalInterest = 0, actualInstallments = 0;
-  for(let i=1;i<=calcInstallments;i++){
-    let interest = Math.round((balance * (interestRate/100)*30)/365);
-    let principal = Math.min(monthlyPrincipal, balance);
-    balance -= principal;
-    totalInterest += interest;
-    actualInstallments++;
-    if(balance<=0) break;
+  let bal = loan, totInt = 0, actualI = 0;
+  for (let i = 0; i < ci; i++) {
+    const interest = Math.round((bal * (rate/100) * 30) / 365);
+    const prin = Math.min(mp, bal);
+    bal -= prin;
+    totInt += interest;
+    actualI++;
+    if (bal <= 0) break;
   }
 
-  let totalPayment = loanAmount + totalInterest;
-  let monthlyPayment = monthlyPrincipal + (totalInterest/actualInstallments);
-  let interest31 = Math.round((loanAmount * (interestRate/100)*31)/365);
-  let net = income - expense - monthlyPayment;
-  let remainPct = income>0 ? (net/income)*100 : 0;
-  let minRemain = income * 0.3;
-  let status = net >= minRemain;
+  const interest31 = Math.round((loan * (rate/100) * 31) / 365);
+  const net = income - expense - (mp + totInt/actualI);
+  const pct = income > 0 ? (net / income) * 100 : 0;
+  const minRemain = income * 0.3;
+  const ok = net >= minRemain;
 
-  let resultDiv = document.getElementById('resultDiv');
-  resultDiv.innerHTML = `
+  const result = document.getElementById('resultDiv');
+  result.innerHTML = `
     <h3>สรุปผลการคำนวณ</h3>
-    <p>วงเงินกู้ : ${loanAmount.toLocaleString()} บาท</p>
-    <p>จำนวนงวดที่ต้องส่ง : ${actualInstallments.toLocaleString()} งวด</p>
-    <p>ส่งต้น ต่อเดือน : ${monthlyPrincipal.toLocaleString()} บาท</p>
-    <p>ดอกเบี้ย ต่อเดือน (คำนวณ 31 วัน) : ${interest31.toLocaleString()} บาท</p>
-    <p>ต้องส่งชำระต่อเดือน : ${(monthlyPrincipal+interest31).toLocaleString()} บาท</p>
-
-    <p>รายได้คงเหลือ : ${net.toLocaleString()} บาท (${remainPct.toFixed(2)}%)</p>
-    <p style="color:${status?'green':'red'}; font-weight:bold;">
-      ${status?'เป็นไปตามเกณฑ์':'ไม่เป็นไปตามเกณฑ์ (ปรึกษาฝ่ายสินเชื่อ)'}
+    <p><b>เลขทะเบียนสมาชิก :</b> ${memberId}</p>
+    <p><b>ชื่อ - นามสกุล :</b> ${fullName}</p>
+    <hr>
+    <p>วงเงินกู้ : ${loan.toLocaleString()} บาท</p>
+    <p>จำนวนงวดที่ต้องส่ง : ${ci.toLocaleString()} งวด</p>
+    <p>ส่งต้นต่อเดือน : ${mp.toLocaleString()} บาท</p>
+    <p>ดอกเบี้ยต่อเดือน (31 วัน) : ${interest31.toLocaleString()} บาท</p>
+    <p>รายได้คงเหลือ : ${net.toLocaleString()} บาท (${pct.toFixed(2)}%)</p>
+    <p style="color:${ok?'green':'red'}; font-weight:bold;">
+      ${ok ? 'เป็นไปตามเกณฑ์' : 'ไม่เป็นไปตามเกณฑ์ (ปรึกษาฝ่ายสินเชื่อ)'}
     </p>
-    <div class="status-bar"><div class="status-fill" style="width:${Math.max(0, Math.min(100,remainPct))}%; background-color:${status?'green':'red'};"></div></div>
+    <div class="status-bar">
+      <div class="status-fill" style="width:${Math.max(0, Math.min(100, pct))}%; background-color:${ok?'green':'red'};"></div>
+    </div>
     <p>รายได้ที่ต้องเหลือขั้นต่ำ 30% : ${minRemain.toLocaleString()} บาท</p>
-
-        <p>**หมายเหตุ : เป็นการคำนวณเบื้องต้น กรุณาติดต่อเจ้าหน้าที่เพื่อความถูกต้องอีกครั้ง</p>
+    <p>**หมายเหตุ : เป็นการคำนวณเบื้องต้น</p>
+    <p>อาจต้องมีการทำประกันสินเชื่อหรือหักเงินฝากค้ำประกัน</p>
+    <p>กรุณาติดต่อเจ้าหน้าที่สินเชื่ออีกครั้ง</p>
   `;
+  document.getElementById('printBtn').style.display = 'inline-block';
 }
 </script>
-
 </body>
 </html>
