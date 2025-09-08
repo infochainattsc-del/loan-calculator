@@ -11,14 +11,36 @@
   button { padding: 10px 20px; font-size: 16px; margin-top: 10px; cursor: pointer; }
   button:disabled { background-color: #ccc; cursor: not-allowed; }
   .result { margin-top: 30px; }
-  .status-bar { width: 100%; background-color: #eee; border-radius: 4px; height: 16px; margin-top: 5px; }
-  .status-fill { height: 16px; border-radius: 4px; }
   p.gray { font-size: 12px; color: gray; }
   p.warning { color: red; font-weight: bold; display: none; }
-  
+
   /* โลโก้ใหญ่ตรงกลางหน้าจอ */
   .logo-center { text-align: center; margin-bottom: 20px; }
   .logo-center img { width: 100px; }
+
+  /* แท่งสถานะปรับขนาดตามหน้าจอ */
+  .status-bar {
+    width: 100%;
+    max-width: 100%;
+    background-color: #eee;
+    border-radius: 8px;
+    height: 24px;
+    margin-top: 5px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .status-fill {
+    height: 100%;
+    border-radius: 8px;
+    transition: width 0.5s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    font-size: 14px;
+  }
 
   /* --- Print Mode --- */
   @media print {
@@ -32,6 +54,13 @@
   }
 
   .print-header { display: none; text-align: center; }
+
+  /* Responsive */
+  @media (max-width: 600px) {
+    .status-bar { height: 20px; }
+    .status-fill { font-size: 12px; }
+    label { width: 100%; margin-bottom: 5px; }
+  }
 </style>
 </head>
 <body>
@@ -40,7 +69,7 @@
 <div class="logo-center">
   <img src="https://www.chainattsc.com/mediafiles/coop/logo/logo300.png" alt="โลโก้สหกรณ์">
   <h2>สหกรณ์ออมทรัพย์ครูชัยนาท จำกัด</h2>
-    <h3>โปรแกรมคำนวณสินเชื่อ (ด้วยตนเอง)</h3>
+  <h3>โปรแกรมคำนวณสินเชื่อ (ด้วยตนเอง)</h3>
 </div>
 
 <div>
@@ -119,7 +148,7 @@ function updateMonthlyPrincipal() {
   const warn = document.getElementById('warningMsg');
   let mp = parseNumber(mpInput.value);
   if (mp <= 0) return;
-  mp = Math.round(mp);
+  mp = Math.round(mp); // ปัดเป็นจำนวนเต็ม
   mpInput.value = formatNumber(mp);
   const ci = Math.ceil(loan / mp);
   instInput.value = ci;
@@ -150,7 +179,7 @@ function calculateLoan() {
   const income = parseNumber(document.getElementById('income').value);
   const expense = parseNumber(document.getElementById('expense').value);
   let mp = parseNumber(document.getElementById('monthlyPrincipal').value);
-  if (mp <= 0) mp = Math.round(loan / 150);
+  if (mp <= 0) mp = Math.round(loan / 150); // ปัดเป็นจำนวนเต็ม
   const ci = Math.ceil(loan / mp);
   if (ci > 240) return;
   document.getElementById('installments').value = ci;
@@ -186,7 +215,9 @@ function calculateLoan() {
       ${ok ? 'เป็นไปตามเกณฑ์' : 'ไม่เป็นไปตามเกณฑ์ (ปรึกษาฝ่ายสินเชื่อ)'}
     </p>
     <div class="status-bar">
-      <div class="status-fill" style="width:${Math.max(0, Math.min(100, pct))}%; background-color:${ok?'green':'red'};"></div>
+      <div class="status-fill" style="width:${Math.max(0, Math.min(100, pct))}%; background-color:${ok?'green':'red'};">
+        ${pct.toFixed(2)}%
+      </div>
     </div>
     <p>รายได้ที่ต้องเหลือขั้นต่ำ 30% : ${minRemain.toLocaleString()} บาท</p>
     <p>**หมายเหตุ : เป็นการคำนวณเบื้องต้น</p>
