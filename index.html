@@ -4,173 +4,141 @@
 <meta charset="UTF-8">
 <title>โปรแกรมคำนวณสินเชื่อ</title>
 <style>
-  /* --- Layout เต็มหน้าจอ --- */
-  html, body {
+body { font-family: sans-serif; margin:0; padding:0; background:#f9f9f9; display:flex; justify-content:center; }
+.container { width: 100%; max-width: 800px; padding:20px; box-sizing: border-box; }
+
+label { display: inline-block; width: 200px; }
+.input-group { margin-bottom: 15px; }
+.input-group input { background-color: #fff; padding: 5px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; }
+input.red { color: red; font-weight: bold; }
+
+button { padding: 8px 16px; font-size: 14px; margin-top: 8px; cursor: pointer; }
+button:disabled { background-color: #ccc; cursor: not-allowed; }
+
+.result { margin-top: 20px; text-align: left; font-size: 13px; line-height: 1.3; }
+.result h3 { text-align: center; margin-bottom: 8px; font-size: 16px; }
+p.gray { font-size: 11px; color: gray; margin: 2px 0; }
+p.warning { color: red; font-weight: bold; display: none; margin: 2px 0; }
+
+.logo-center { text-align: center; margin-bottom: 15px; }
+.logo-center img { width: 80px; }
+
+.status-bar { width: 100%; background-color: #eee; border-radius: 8px; height: 18px; margin: 5px 0; overflow: hidden; position: relative; }
+.status-fill { height: 100%; border-radius: 8px; transition: width 0.5s ease; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 12px; }
+
+.print-header { display: none; }
+
+/* --- Print Mode --- */
+@media print {
+  body { background: #fff; padding: 0; margin: 0; font-size: 16px; display:block; }
+  .container { width: 100%; margin: 0; padding: 0; }
+  input, button, .gray, .warning, label { display: none !important; }
+
+  .print-header {
+    display: block;
+    text-align: center;
+    margin-bottom: 15px;
+  }
+  .print-header img { width: 100px; margin-bottom: 5px; }
+  .print-header h2, .print-header h3 { margin: 2px 0; font-size: 18px; }
+  .print-header p { margin: 2px 0; font-size: 14px; }
+
+  .logo-center { display: none; }
+
+  .status-bar { border: 1px solid #000; height: 16px; }
+  .status-fill { font-size: 14px; }
+
+  .result {
     margin: 0;
-    padding: 0;
-    width: 100%;
-    font-family: sans-serif;
-    background: #f9f9f9;
-    box-sizing: border-box;
+    padding-top: 0;
+    font-size: 16px; 
+    line-height: 1.4;
+    page-break-inside: avoid;
+    page-break-after: avoid;
   }
 
-  body {
-    padding: 20px;
-  }
+  @page { margin: 20mm; }
+}
 
-  .form-group {
-    display: flex;
-    align-items: center;
-    margin-bottom: 10px;
-    flex-wrap: wrap;
-  }
+@media (max-width: 768px) {
+  .status-bar { height: 16px; }
+  .status-fill { font-size: 12px; }
+  label { width: 100%; margin-bottom: 5px; display:block; }
+}
 
-  label {
-    width: 200px;
-    margin-right: 10px;
-  }
-
-  input {
-    flex: 1;
-    min-width: 150px;
-    padding: 5px;
-    border-radius: 4px;
-    border: 1px solid #ccc;
-    background-color: #fff;
-  }
-
-  input.red { color: red; font-weight: bold; }
-
-  button {
-    padding: 10px 20px;
-    font-size: 16px;
-    margin-top: 10px;
-    cursor: pointer;
-  }
-
-  button:disabled { background-color: #ccc; cursor: not-allowed; }
-
-  .result { margin-top: 30px; }
-
-  p.gray { font-size: 12px; color: gray; }
-  p.warning { color: red; font-weight: bold; display: none; }
-
-  /* โลโก้ตรงกลาง */
-  .logo-center { text-align: center; margin-bottom: 20px; }
-  .logo-center img { width: 100px; }
-
-  /* แท่งสถานะเต็มความกว้าง */
-  .status-bar {
-    width: 100%;
-    background-color: #eee;
-    border-radius: 8px;
-    height: 30px;
-    margin-top: 5px;
-    overflow: hidden;
-    position: relative;
-  }
-
-  .status-fill {
-    height: 100%;
-    border-radius: 8px;
-    transition: width 0.5s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-weight: bold;
-    font-size: 16px;
-  }
-
-  /* Print mode */
-  @media print {
-    body { background: #fff; width: 100%; }
-    input, button, .gray, .warning, h2 { display: none !important; }
-    .logo-center { display: none !important; }
-    .print-header { display: block !important; margin-bottom: 20px; text-align: center; }
-    .print-header img { width: 120px; display: block; margin: 0 auto 10px auto; }
-    .print-header h1 { margin: 0; font-size: 22px; display: block; }
-    .status-bar { border: 1px solid #000; }
-  }
-
-  .print-header { display: none; text-align: center; }
-
-  /* Responsive */
-  @media (max-width: 768px) {
-    .status-bar { height: 25px; }
-    .status-fill { font-size: 14px; }
-    .form-group { flex-direction: column; align-items: flex-start; }
-    label { width: 100%; margin-bottom: 5px; }
-    input { width: 100%; margin-bottom: 5px; }
-  }
-
-  @media (max-width: 480px) {
-    .status-bar { height: 20px; }
-    .status-fill { font-size: 12px; }
-  }
+@media (max-width: 480px) {
+  .status-bar { height: 14px; }
+  .status-fill { font-size: 11px; }
+  label { width: 100%; margin-bottom: 5px; display:block; }
+}
 </style>
 </head>
 <body>
+<div class="container">
 
-<div class="logo-center">
-  <img src="https://www.chainattsc.com/mediafiles/coop/logo/logo300.png" alt="โลโก้สหกรณ์">
-  <h2>สหกรณ์ออมทรัพย์ครูชัยนาท จำกัด</h2>
-  <h3>โปรแกรมคำนวณสินเชื่อ (ด้วยตนเอง)</h3>
+  <div class="logo-center">
+    <img src="https://www.chainattsc.com/mediafiles/coop/logo/logo300.png" alt="โลโก้สหกรณ์">
+    <h2>สหกรณ์ออมทรัพย์ครูชัยนาท จำกัด</h2>
+    <h3>โปรแกรมคำนวณสินเชื่อ (ด้วยตนเอง)</h3>
+  </div>
+
+  <div class="print-header">
+    <img src="https://www.chainattsc.com/mediafiles/coop/logo/logo300.png" alt="โลโก้สหกรณ์">
+    <h2>สหกรณ์ออมทรัพย์ครูชัยนาท จำกัด</h2>
+    <h3>โปรแกรมคำนวณสินเชื่อ (ด้วยตนเอง)</h3>
+    <p>ที่อยู่ : 248 หมู่ 5 ถนนพหลโยธิน ตำบลบ้านกล้วย อำเภอเมืองชัยนาท จังหวัดชัยนาท</p>
+    <p>โทรศัพท์ : 056-411412 ต่อ 15 | มือถือ : 092-993-3593 (ฝ่ายเทคโนโลยีสารสนเทศ)</p>
+    <p>เว็บไซต์ : www.chainattsc.com | Line Official ID : @ctsc</p>
+  </div>
+
+  <div class="input-group">
+    <label>เลขทะเบียนสมาชิก (6 หลัก) :</label>
+    <input id="memberId" type="text" maxlength="6" placeholder="เช่น 009080">
+  </div>
+
+  <div class="input-group">
+    <label>ชื่อ - นามสกุล :</label>
+    <input id="fullName" type="text" placeholder="กรอกชื่อ-นามสกุล">
+  </div>
+
+  <div class="input-group">
+    <label>วงเงินกู้ :</label>
+    <input id="loanAmount" type="text" value="0">
+  </div>
+
+  <div class="input-group">
+    <label>อัตราดอกเบี้ย (ต่อปี) :</label>
+    <input id="interestRate" type="number" value="5">
+  </div>
+
+  <div class="input-group">
+    <label>เงินต้นที่ต้องการส่งต่อเดือน :</label>
+    <input id="monthlyPrincipal" type="text" value="0">
+    <p class="gray">* ระบบจะปรับเป็นจำนวนเต็ม</p>
+  </div>
+
+  <div class="input-group">
+    <label>จำนวนงวด (สูงสุด 240) :</label>
+    <input id="installments" type="number" readonly>
+    <p class="gray">จำนวนงวดส่ง ไม่เกิน 240 งวด (สมาชิกใหม่ 150 งวด)</p>
+    <p id="warningMsg" class="warning">❌ จำนวนงวดเกิน 240 ไม่สามารถคำนวณได้</p>
+  </div>
+
+  <div class="input-group">
+    <label>รายได้ต่อเดือน :</label>
+    <input id="income" type="text" value="0">
+  </div>
+
+  <div class="input-group">
+    <label>ค่าใช้จ่ายต่อเดือน :</label>
+    <input id="expense" type="text" value="0">
+  </div>
+
+  <button id="calcBtn" onclick="calculateLoan()">คำนวณ</button>
+  <button id="printBtn" onclick="window.print()" style="display:none;">พิมพ์เอกสาร</button>
+
+  <div class="result" id="resultDiv"></div>
 </div>
-
-<div class="form-group">
-  <label>เลขทะเบียนสมาชิก (6 หลัก) :</label>
-  <input id="memberId" type="text" maxlength="6" placeholder="เช่น 009080">
-</div>
-
-<div class="form-group">
-  <label>ชื่อ - นามสกุล :</label>
-  <input id="fullName" type="text" placeholder="กรอกชื่อ-นามสกุล">
-</div>
-
-<div class="form-group">
-  <label>วงเงินกู้ :</label>
-  <input id="loanAmount" type="text" value="0">
-</div>
-
-<div class="form-group">
-  <label>อัตราดอกเบี้ย (ต่อปี) :</label>
-  <input id="interestRate" type="number" value="5">
-</div>
-
-<div class="form-group">
-  <label>เงินต้นที่ต้องการส่งต่อเดือน :</label>
-  <input id="monthlyPrincipal" type="text" value="0">
-  <p class="gray">* ระบบจะปรับเป็นจำนวนเต็ม</p>
-</div>
-
-<div class="form-group">
-  <label>จำนวนงวด (สูงสุด 240) :</label>
-  <input id="installments" type="number" readonly>
-  <p class="gray">จำนวนงวดส่ง ไม่เกิน 240 งวด (สมาชิกใหม่ 150 งวด)</p>
-  <p id="warningMsg" class="warning">❌ จำนวนงวดเกิน 240 ไม่สามารถคำนวณได้</p>
-</div>
-
-<div class="form-group">
-  <label>รายได้ต่อเดือน :</label>
-  <input id="income" type="text" value="0">
-</div>
-
-<div class="form-group">
-  <label>ค่าใช้จ่ายต่อเดือน :</label>
-  <input id="expense" type="text" value="0">
-</div>
-
-<button id="calcBtn" onclick="calculateLoan()">คำนวณ</button>
-<button id="printBtn" onclick="window.print()" style="display:none;">พิมพ์เอกสาร (A4)</button>
-
-<div class="print-header">
-  <img src="https://www.chainattsc.com/mediafiles/coop/logo/logo300.png" alt="โลโก้สหกรณ์">
-  <h1>สหกรณ์ออมทรัพย์ครูชัยนาท จำกัด</h1>
-  <hr>
-</div>
-
-<div class="result" id="resultDiv"></div>
 
 <script>
 function formatMemberId() {
@@ -254,6 +222,8 @@ function calculateLoan() {
     <p>จำนวนงวดที่ต้องส่ง : ${ci.toLocaleString()} งวด</p>
     <p>ส่งต้นต่อเดือน : ${mp.toLocaleString()} บาท</p>
     <p>ดอกเบี้ยต่อเดือน (31 วัน) : ${interest31.toLocaleString()} บาท</p>
+    <p>รายได้ต่อเดือน : ${income.toLocaleString()} บาท</p>
+    <p>ค่าใช้จ่ายต่อเดือน : ${expense.toLocaleString()} บาท</p>
     <p>รายได้คงเหลือ : ${net.toLocaleString()} บาท (${pct.toFixed(2)}%)</p>
     <p style="color:${ok?'green':'red'}; font-weight:bold;">
       ${ok ? 'เป็นไปตามเกณฑ์' : 'ไม่เป็นไปตามเกณฑ์ (ปรึกษาฝ่ายสินเชื่อ)'}
