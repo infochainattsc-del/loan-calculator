@@ -24,7 +24,7 @@
     max-width: 100%;
     background-color: #eee;
     border-radius: 8px;
-    height: 24px;
+    height: 30px;
     margin-top: 5px;
     overflow: hidden;
     position: relative;
@@ -39,7 +39,7 @@
     justify-content: center;
     color: white;
     font-weight: bold;
-    font-size: 14px;
+    font-size: 16px;
   }
 
   /* --- Print Mode --- */
@@ -56,7 +56,13 @@
   .print-header { display: none; text-align: center; }
 
   /* Responsive */
-  @media (max-width: 600px) {
+  @media (max-width: 768px) { /* แท็บเล็ต */
+    .status-bar { height: 25px; }
+    .status-fill { font-size: 14px; }
+    label { width: 100%; margin-bottom: 5px; }
+  }
+
+  @media (max-width: 480px) { /* มือถือ */
     .status-bar { height: 20px; }
     .status-fill { font-size: 12px; }
     label { width: 100%; margin-bottom: 5px; }
@@ -128,7 +134,7 @@
 <div class="result" id="resultDiv"></div>
 
 <script>
-// จัดเลขสมาชิก 6 หลักอัตโนมัติ
+// ฟังก์ชันจัดเลขสมาชิก 6 หลัก
 function formatMemberId() {
   const input = document.getElementById("memberId");
   let v = input.value.replace(/\D/g, "");
@@ -148,7 +154,7 @@ function updateMonthlyPrincipal() {
   const warn = document.getElementById('warningMsg');
   let mp = parseNumber(mpInput.value);
   if (mp <= 0) return;
-  mp = Math.round(mp); // ปัดเป็นจำนวนเต็ม
+  mp = Math.round(mp);
   mpInput.value = formatNumber(mp);
   const ci = Math.ceil(loan / mp);
   instInput.value = ci;
@@ -179,7 +185,7 @@ function calculateLoan() {
   const income = parseNumber(document.getElementById('income').value);
   const expense = parseNumber(document.getElementById('expense').value);
   let mp = parseNumber(document.getElementById('monthlyPrincipal').value);
-  if (mp <= 0) mp = Math.round(loan / 150); // ปัดเป็นจำนวนเต็ม
+  if (mp <= 0) mp = Math.round(loan / 150);
   const ci = Math.ceil(loan / mp);
   if (ci > 240) return;
   document.getElementById('installments').value = ci;
