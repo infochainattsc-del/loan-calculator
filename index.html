@@ -9,24 +9,25 @@ body {
   font-family: "Tahoma", sans-serif; 
   background:#f5f6fa; 
   margin:0; 
-  padding:20px; 
+  padding:0; 
   display:flex; 
-  justify-content:center; /* กึ่งกลางแนวนอน */
-  align-items:flex-start; /* เลื่อนตามเนื้อหาแนวตั้ง */
+  justify-content:center; 
   min-height:100vh;
 }
 .container { 
   width:100%; 
   max-width:600px; 
   background:#fff; 
-  padding:25px; 
+  padding:20px; 
   border-radius:12px; 
   box-shadow:0 4px 12px rgba(0,0,0,0.1); 
   box-sizing:border-box; 
-  margin:0 auto; /* กึ่งกลางแนวนอน */
+  margin:20px;
+  display:flex;
+  flex-direction:column;
 }
 
-/* โลโก้ + ชื่อโปรแกรม + ชื่อสหกรณ์ */
+/* --- โลโก้ + ชื่อโปรแกรม --- */
 .header-display {
   text-align:center; 
   margin-bottom:15px; 
@@ -62,7 +63,8 @@ button {
 #calcBtn:disabled { background:#ccc; cursor:not-allowed; }
 #printBtn { background:#28a745; color:white; display:none; }
 
-.result-wrapper { display:none; margin-top:20px; }
+/* --- แสดงผล --- */
+.result-wrapper { display:none; margin-top:20px; flex-grow:1; }
 .result { 
   background:#f9f9f9; 
   padding:15px; 
@@ -70,6 +72,9 @@ button {
   border:1px solid #ddd; 
   font-size:14px; 
   line-height:1.5; 
+  width:100%;
+  height:100%;
+  overflow:auto;
 }
 .result h3 { text-align:center; margin-top:0; }
 p.gray { font-size:12px; color:gray; margin:4px 0; }
@@ -78,8 +83,10 @@ p.warning { color:red; font-weight:bold; display:none; margin:4px 0; }
 .status-bar { width:100%; background-color:#eee; border-radius:8px; height:18px; margin:5px 0; overflow:hidden; }
 .status-fill { height:100%; border-radius:8px; transition:width 0.5s ease; display:flex; align-items:center; justify-content:center; color:white; font-weight:bold; font-size:12px; }
 
-/* หัวกระดาษสำหรับพิมพ์ */
-.print-header { display:none; }
+/* --- หัวกระดาษสำหรับพิมพ์ --- */
+.print-header { display:none; text-align:center; margin-bottom:20px; }
+.print-header img { width:100px; margin-bottom:5px; }
+.print-header h2, .print-header h3 { margin:2px 0; font-size:18px; }
 
 /* --- Print Mode --- */
 @media print {
@@ -96,7 +103,8 @@ p.warning { color:red; font-weight:bold; display:none; margin:4px 0; }
     overflow:visible;
     position:relative;
   }
-  input, button, .gray, .warning, label, .header-display { display:none !important; }
+  input, button, label, .gray, .warning, .header-display { display:none !important; }
+  .print-header { display:block; }
 
   .container::after {
     content: "ผู้พัฒนา ฝ่ายเทคโนโลยีสารสนเทศ สหกรณ์ออมทรัพย์ครูชัยนาท จำกัด";
@@ -109,24 +117,7 @@ p.warning { color:red; font-weight:bold; display:none; margin:4px 0; }
     color: #555;
   }
 
-  .print-header { 
-    display:block; 
-    text-align:center; 
-    position:absolute; 
-    top:0; 
-    left:0; 
-    width:100%; 
-    z-index:10; 
-  }
-  .print-header img { width:100px; margin-bottom:5px; }
-  .print-header h2, .print-header h3 { margin:2px 0; font-size:18px; }
-
-  .result-wrapper { 
-    display:block; 
-    margin-top:140px; /* เว้นระยะหลังหัวกระดาษ */
-    overflow:visible; 
-  }
-
+  .result-wrapper { display:block; margin-top:20px; overflow:visible; }
   .result { font-size:16px; line-height:1.6; border:none; background:none; position:relative; z-index:10; }
 
   .result table { width:100%; border-collapse:collapse; font-size:16px; }
@@ -140,22 +131,21 @@ p.warning { color:red; font-weight:bold; display:none; margin:4px 0; }
 @media (max-width:600px){
   .container { padding:15px; }
   .header-display h2, .header-display h3 { font-size:0.9rem; }
-  .input-group input { font-size:13px; padding:8px; }
-  button { font-size:14px; padding:8px; }
+  .input-group input { font-size:14px; padding:10px; } /* ช่องกรอกคงขนาดเดิม */
+  button { font-size:14px; padding:10px; }
 }
 </style>
 </head>
 <body>
 <div class="container">
 
-  <!-- โลโก้ + ชื่อโปรแกรม + ชื่อสหกรณ์ -->
   <div class="header-display">
     <img src="https://www.chainattsc.com/mediafiles/coop/logo/logo300.png" alt="โลโก้สหกรณ์">
     <h3>โปรแกรมคำนวณสินเชื่อ (ด้วยตนเอง)</h3>
     <h2>สหกรณ์ออมทรัพย์ครูชัยนาท จำกัด</h2>
   </div>
 
-  <!-- ฟอร์มกรอกข้อมูล -->
+  <!-- ฟอร์ม -->
   <div class="input-group">
     <label>เลขทะเบียนสมาชิก (6 หลัก)</label>
     <input id="memberId" type="text" maxlength="6" placeholder="เช่น 009080">
@@ -179,7 +169,7 @@ p.warning { color:red; font-weight:bold; display:none; margin:4px 0; }
   <div class="input-group">
     <label>จำนวนงวด (สูงสุด 240)</label>
     <input id="installments" type="number" readonly>
-    <p class="gray">* จำนวนงวด ส่งไม่เกิน 240 งวด (สมาชิกใหม่ 150 งวด)</p>
+    <p class="gray">* จำนวนงวด ส่งไม่เกิน 240 งวด</p>
     <p id="warningMsg" class="warning">❌ จำนวนงวดเกิน 240 ไม่สามารถคำนวณได้</p>
   </div>
   <div class="input-group">
@@ -194,7 +184,7 @@ p.warning { color:red; font-weight:bold; display:none; margin:4px 0; }
   <button id="calcBtn" onclick="calculateLoan()">คำนวณ</button>
   <button id="printBtn" onclick="window.print()">พิมพ์เอกสาร</button>
 
-  <!-- หัวกระดาษสำหรับพิมพ์ -->
+  <!-- หัวกระดาษเฉพาะพิมพ์ -->
   <div class="print-header">
     <img src="https://www.chainattsc.com/mediafiles/coop/logo/logo300.png" alt="โลโก้สหกรณ์">
     <h2>สหกรณ์ออมทรัพย์ครูชัยนาท จำกัด</h2>
@@ -203,6 +193,7 @@ p.warning { color:red; font-weight:bold; display:none; margin:4px 0; }
     <h3>www.chainattsc.com, Line Official ID : @ctsc</h3>
   </div>
 
+  <!-- แสดงผล -->
   <div class="result-wrapper">
     <div class="result" id="resultDiv"></div>
   </div>
@@ -306,7 +297,7 @@ function calculateLoan(){
     <p>อาจต้องมีการทำประกันสินเชื่อหรือหักเงินฝากค้ำประกัน</p>
     <p>กรุณาติดต่อเจ้าหน้าที่สินเชื่ออีกครั้ง</p>
   `;
-  document.querySelector('.result-wrapper').style.display='block';
+  document.querySelector('.result-wrapper').style.display='flex';
   document.getElementById('printBtn').style.display='block';
 }
 </script>
