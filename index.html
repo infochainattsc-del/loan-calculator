@@ -11,7 +11,7 @@ body {
   background:#f9f9f9; 
   display:flex; 
   justify-content:center;   /* กึ่งกลางแนวนอน */
-  align-items: flex-start;  /* ชิดด้านบนสุด */
+  align-items: flex-start;  /* ชิดด้านบนเสมอ */
   min-height: 100vh;
 }
 .container { 
@@ -19,6 +19,7 @@ body {
   max-width: 800px; 
   padding:20px; 
   box-sizing: border-box; 
+  text-align: left;
 }
 
 label { display: inline-block; width: 200px; }
@@ -31,10 +32,10 @@ button:disabled { background-color: #ccc; cursor: not-allowed; }
 
 .result-wrapper {
   display: none;
-  justify-content: center;
-  align-items: center;
+  justify-content: flex-start; /* ชิดบน */
+  align-items: flex-start;     /* ชิดบน */
   text-align: center;
-  min-height: 60vh;
+  min-height: auto; 
 }
 .result { 
   background: #fff; 
@@ -263,7 +264,7 @@ function calculateLoan() {
     <p>อาจต้องมีการทำประกันสินเชื่อหรือหักเงินฝากค้ำประกัน</p>
     <p>กรุณาติดต่อเจ้าหน้าที่สินเชื่ออีกครั้ง</p>
   `;
-  document.querySelector('.result-wrapper').style.display = 'flex';
+  document.querySelector('.result-wrapper').style.display = 'block'; // ชิดบน
   document.getElementById('printBtn').style.display = 'inline-block';
 }
 </script>
