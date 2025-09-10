@@ -1,4 +1,3 @@
-<!-- แก้ไข Base Code โปรแกรมสินเชื่อ -->
 <!DOCTYPE html>
 <html lang="th">
 <head>
@@ -12,90 +11,92 @@ body {
   background:#f9f9f9; 
   display:flex; 
   justify-content:center;   /* กึ่งกลางแนวนอน */
-  align-items: flex-start;  /* ชิดด้านบน */
-  min-height: 100vh;
+  align-items:flex-start;   /* ชิดด้านบน */
+  min-height:100vh;
 }
 .container { 
-  width: 100%; 
-  max-width: 800px; 
+  width:100%; 
+  max-width:800px; 
   padding:20px; 
-  box-sizing: border-box; 
-  margin: 0 auto;           /* กึ่งกลางแนวนอนเสมอ */
+  box-sizing:border-box; 
 }
 
-label { display: inline-block; width: 200px; }
-.input-group { margin-bottom: 15px; }
-.input-group input { background-color: #fff; padding: 5px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; }
-input.red { color: red; font-weight: bold; }
+.input-group {
+  display:flex;
+  flex-wrap:nowrap;
+  align-items:center;
+  margin-bottom:15px;
+}
+.input-group label {
+  flex:0 0 200px;
+  margin-right:10px;
+}
+.input-group input {
+  flex:1 1 auto;
+  background-color:#fff;
+  padding:5px;
+  border:1px solid #ccc;
+  border-radius:4px;
+  font-size:14px;
+}
+input.red { color:red; font-weight:bold; }
 
-button { padding: 8px 16px; font-size: 14px; margin-top: 8px; cursor: pointer; }
-button:disabled { background-color: #ccc; cursor: not-allowed; }
+button { padding:8px 16px; font-size:14px; margin-top:8px; cursor:pointer; }
+button:disabled { background-color:#ccc; cursor:not-allowed; }
 
 .result-wrapper {
-  display: none;
-  justify-content: center;
-  align-items: flex-start; /* ชิดด้านบน */
-  text-align: center;
-  width: 100%;
+  display:none;
+  justify-content:center;
+  align-items:center;
+  text-align:center;
+  min-height:60vh;
 }
 .result { 
-  background: #fff; 
-  padding: 20px; 
-  border-radius: 8px; 
-  box-shadow: 0 0 8px rgba(0,0,0,0.1); 
-  max-width: 600px; 
-  width: 100%;
-  font-size: 13px; 
-  line-height: 1.3; 
-  margin: 0 auto;   /* กึ่งกลางแนวนอน */
+  background:#fff; 
+  padding:20px; 
+  border-radius:8px; 
+  box-shadow:0 0 8px rgba(0,0,0,0.1); 
+  max-width:600px; 
+  width:100%;
+  font-size:13px; 
+  line-height:1.3; 
 }
-.result h3 { text-align: center; margin-bottom: 8px; font-size: 16px; }
-p.gray { font-size: 11px; color: gray; margin: 2px 0; }
-p.warning { color: red; font-weight: bold; display: none; margin: 2px 0; }
+.result h3 { text-align:center; margin-bottom:8px; font-size:16px; }
+p.gray { font-size:11px; color:gray; margin:2px 0; }
+p.warning { color:red; font-weight:bold; display:none; margin:2px 0; }
 
-.logo-center { text-align: center; margin-bottom: 15px; }
-.logo-center img { width: 80px; }
+.logo-center { text-align:center; margin-bottom:15px; }
+.logo-center img { width:80px; }
 
-.status-bar { width: 100%; background-color: #eee; border-radius: 8px; height: 18px; margin: 5px 0; overflow: hidden; position: relative; }
-.status-fill { height: 100%; border-radius: 8px; transition: width 0.5s ease; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 12px; }
+.status-bar { width:100%; background-color:#eee; border-radius:8px; height:18px; margin:5px 0; overflow:hidden; position:relative; }
+.status-fill { height:100%; border-radius:8px; transition:width 0.5s ease; display:flex; align-items:center; justify-content:center; color:white; font-weight:bold; font-size:12px; }
 
-.print-header { display: none; }
+.print-header { display:none; }
 
-/* --- Print Mode --- */
+/* Print Mode */
 @media print {
-  body { background: #fff; padding: 0; margin: 0; font-size: 16px; display:block; }
-  .container { width: 100%; margin: 0; padding: 0; }
-  input, button, .gray, .warning, label { display: none !important; }
-
-  .print-header {
-    display: block;
-    text-align: center;
-    margin-bottom: 15px;
+  body, .container { 
+    width:210mm; max-width:210mm; 
+    background:#fff; padding:10mm; margin:0; 
+    font-size:16px; display:block; 
   }
-  .print-header img { width: 100px; margin-bottom: 5px; }
-  .print-header h2, .print-header h3 { margin: 2px 0; font-size: 18px; }
-  .print-header p { margin: 2px 0; font-size: 14px; }
-
-  .logo-center { display: none; }
-
-  .status-bar { border: 1px solid #000; height: 16px; }
-  .status-fill { font-size: 14px; }
-
-  .result-wrapper { display: block; min-height: auto; }
-  .result { margin: 0 auto; font-size: 16px; line-height: 1.4; box-shadow: none; border: none; }
-  @page { margin: 20mm; }
+  input, button, .gray, .warning, label { display:none !important; }
+  .print-header { display:block; text-align:center; margin-bottom:15px; }
+  .print-header img { width:100px; margin-bottom:5px; }
+  .print-header h2, .print-header h3 { margin:2px 0; font-size:18px; }
+  .print-header p { margin:2px 0; font-size:14px; }
+  .result-wrapper { display:block; min-height:auto; }
+  .result { margin:0 auto; font-size:16px; line-height:1.4; box-shadow:none; border:none; }
+  @page { size:A4; margin:15mm; }
 }
 
-@media (max-width: 768px) {
-  .status-bar { height: 16px; }
-  .status-fill { font-size: 12px; }
-  label { width: 100%; margin-bottom: 5px; display:block; }
-}
-
-@media (max-width: 480px) {
-  .status-bar { height: 14px; }
-  .status-fill { font-size: 11px; }
-  label { width: 100%; margin-bottom: 5px; display:block; }
+/* Mobile */
+@media (max-width:480px) {
+  .input-group { flex-wrap:wrap; }
+  .input-group label { flex:0 0 100%; margin-bottom:5px; }
+  .input-group input { flex:1 1 100%; }
+  .status-bar { height:14px; }
+  .status-fill { font-size:11px; }
 }
 </style>
 </head>
@@ -140,13 +141,12 @@ p.warning { color: red; font-weight: bold; display: none; margin: 2px 0; }
   <div class="input-group">
     <label>เงินต้นที่ต้องการส่งต่อเดือน :</label>
     <input id="monthlyPrincipal" type="text" value="0">
-    <p class="gray">* ระบบจะปรับเป็นจำนวนเต็ม</p>
   </div>
 
   <div class="input-group">
     <label>จำนวนงวด (สูงสุด 240) :</label>
     <input id="installments" type="number" readonly>
-    <p class="gray">จำนวนงวดส่ง ไม่เกิน 240 งวด (สมาชิกใหม่ 150 งวด)</p>
+    <p class="gray"> * จำนวนงวด ส่งไม่เกิน 240 งวด (สมาชิกใหม่ 150 งวด)</p>
     <p id="warningMsg" class="warning">❌ จำนวนงวดเกิน 240 ไม่สามารถคำนวณได้</p>
   </div>
 
@@ -172,76 +172,76 @@ p.warning { color: red; font-weight: bold; display: none; margin: 2px 0; }
 function formatMemberId() {
   const input = document.getElementById("memberId");
   let v = input.value.replace(/\D/g, "");
-  if (v.length > 0) v = v.padStart(6, "0");
+  if (v.length > 0) v = v.padStart(6,"0");
   input.value = v;
 }
 document.getElementById("memberId").addEventListener("blur", formatMemberId);
 document.getElementById("memberId").addEventListener("keypress", e => { if(e.key==="Enter") formatMemberId(); });
 
-function formatNumber(value) { return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","); }
-function parseNumber(value) { return parseFloat(value.replace(/,/g,'')) || 0; }
+function formatNumber(value){ return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g,","); }
+function parseNumber(value){ return parseFloat(value.replace(/,/g,'')) || 0; }
 
 function updateMonthlyPrincipal() {
-  const loan = parseNumber(document.getElementById('loanAmount').value);
-  const mpInput = document.getElementById('monthlyPrincipal');
-  const instInput = document.getElementById('installments');
-  const warn = document.getElementById('warningMsg');
-  let mp = parseNumber(mpInput.value);
-  if (mp <= 0) return;
-  mp = Math.round(mp);
-  mpInput.value = formatNumber(mp);
-  const ci = Math.ceil(loan / mp);
-  instInput.value = ci;
-  if (ci > 240) {
-    document.getElementById('calcBtn').disabled = true;
-    warn.style.display = 'block';
+  const loan=parseNumber(document.getElementById('loanAmount').value);
+  const mpInput=document.getElementById('monthlyPrincipal');
+  const instInput=document.getElementById('installments');
+  const warn=document.getElementById('warningMsg');
+  let mp=parseNumber(mpInput.value);
+  if(mp<=0) return;
+  mp=Math.round(mp);
+  mpInput.value=formatNumber(mp);
+  const ci=Math.ceil(loan/mp);
+  instInput.value=ci;
+  if(ci>240){
+    document.getElementById('calcBtn').disabled=true;
+    warn.style.display='block';
     instInput.classList.add('red');
   } else {
-    document.getElementById('calcBtn').disabled = false;
-    warn.style.display = 'none';
+    document.getElementById('calcBtn').disabled=false;
+    warn.style.display='none';
     instInput.classList.remove('red');
   }
 }
 
-['loanAmount','income','expense','monthlyPrincipal'].forEach(id =>
-  document.getElementById(id).addEventListener('input', e => {
-    const v = parseNumber(e.target.value);
-    e.target.value = formatNumber(v);
-    if (id === 'loanAmount' || id === 'monthlyPrincipal') updateMonthlyPrincipal();
+['loanAmount','income','expense','monthlyPrincipal'].forEach(id=>
+  document.getElementById(id).addEventListener('input', e=>{
+    const v=parseNumber(e.target.value);
+    e.target.value=formatNumber(v);
+    if(id==='loanAmount'||id==='monthlyPrincipal') updateMonthlyPrincipal();
   })
 );
 
-function calculateLoan() {
-  const memberId = document.getElementById('memberId').value || "-";
-  const fullName = document.getElementById('fullName').value || "-";
-  const loan = parseNumber(document.getElementById('loanAmount').value);
-  const rate = parseFloat(document.getElementById('interestRate').value);
-  const income = parseNumber(document.getElementById('income').value);
-  const expense = parseNumber(document.getElementById('expense').value);
-  let mp = parseNumber(document.getElementById('monthlyPrincipal').value);
-  if (mp <= 0) mp = Math.round(loan / 150);
-  const ci = Math.ceil(loan / mp);
-  if (ci > 240) return;
-  document.getElementById('installments').value = ci;
+function calculateLoan(){
+  const memberId=document.getElementById('memberId').value||"-";
+  const fullName=document.getElementById('fullName').value||"-";
+  const loan=parseNumber(document.getElementById('loanAmount').value);
+  const rate=parseFloat(document.getElementById('interestRate').value);
+  const income=parseNumber(document.getElementById('income').value);
+  const expense=parseNumber(document.getElementById('expense').value);
+  let mp=parseNumber(document.getElementById('monthlyPrincipal').value);
+  if(mp<=0) mp=Math.round(loan/150);
+  const ci=Math.ceil(loan/mp);
+  if(ci>240) return;
+  document.getElementById('installments').value=ci;
 
-  let bal = loan, totInt = 0, actualI = 0;
-  for (let i = 0; i < ci; i++) {
-    const interest = Math.round((bal * (rate/100) * 30) / 365);
-    const prin = Math.min(mp, bal);
-    bal -= prin;
-    totInt += interest;
+  let bal=loan, totInt=0, actualI=0;
+  for(let i=0;i<ci;i++){
+    const interest=Math.round((bal*(rate/100)*30)/365);
+    const prin=Math.min(mp,bal);
+    bal-=prin;
+    totInt+=interest;
     actualI++;
-    if (bal <= 0) break;
+    if(bal<=0) break;
   }
 
-  const interest31 = Math.round((loan * (rate/100) * 31) / 365);
-  const net = income - expense - (mp + totInt/actualI);
-  const pct = income > 0 ? (net / income) * 100 : 0;
-  const minRemain = income * 0.3;
-  const ok = net >= minRemain;
+  const interest31=Math.round((loan*(rate/100)*31)/365);
+  const net=income-expense-(mp+totInt/actualI);
+  const pct=income>0?(net/income)*100:0;
+  const minRemain=income*0.3;
+  const ok=net>=minRemain;
 
-  const result = document.getElementById('resultDiv');
-  result.innerHTML = `
+  const result=document.getElementById('resultDiv');
+  result.innerHTML=`
     <h3>สรุปผลการคำนวณ</h3>
     <p><b>เลขทะเบียนสมาชิก :</b> ${memberId}</p>
     <p><b>ชื่อ - นามสกุล :</b> ${fullName}</p>
@@ -254,10 +254,10 @@ function calculateLoan() {
     <p>ค่าใช้จ่ายต่อเดือน : ${expense.toLocaleString()} บาท</p>
     <p>รายได้คงเหลือ : ${net.toLocaleString()} บาท (${pct.toFixed(2)}%)</p>
     <p style="color:${ok?'green':'red'}; font-weight:bold;">
-      ${ok ? 'เป็นไปตามเกณฑ์' : 'ไม่เป็นไปตามเกณฑ์ (ปรึกษาฝ่ายสินเชื่อ)'}
+      ${ok?'เป็นไปตามเกณฑ์':'ไม่เป็นไปตามเกณฑ์ (ปรึกษาฝ่ายสินเชื่อ)'}
     </p>
     <div class="status-bar">
-      <div class="status-fill" style="width:${Math.max(0, Math.min(100, pct))}%; background-color:${ok?'green':'red'};">
+      <div class="status-fill" style="width:${Math.max(0,Math.min(100,pct))}%; background-color:${ok?'green':'red'};">
         ${pct.toFixed(2)}%
       </div>
     </div>
@@ -266,8 +266,8 @@ function calculateLoan() {
     <p>อาจต้องมีการทำประกันสินเชื่อหรือหักเงินฝากค้ำประกัน</p>
     <p>กรุณาติดต่อเจ้าหน้าที่สินเชื่ออีกครั้ง</p>
   `;
-  document.querySelector('.result-wrapper').style.display = 'flex';
-  document.getElementById('printBtn').style.display = 'inline-block';
+  document.querySelector('.result-wrapper').style.display='flex';
+  document.getElementById('printBtn').style.display='inline-block';
 }
 </script>
 </body>
