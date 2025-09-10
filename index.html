@@ -92,11 +92,29 @@ p.warning { color:red; font-weight:bold; display:none; margin:2px 0; }
 
 /* Mobile */
 @media (max-width:480px) {
-  .input-group { flex-wrap:wrap; }
-  .input-group label { flex:0 0 100%; margin-bottom:5px; }
-  .input-group input { flex:1 1 100%; }
-  .status-bar { height:14px; }
-  .status-fill { font-size:11px; }
+  .input-group { 
+    flex-wrap:wrap; 
+    background:#fffbe6;     /* เพิ่มพื้นหลังให้เด่น */
+    padding:10px; 
+    border-radius:8px; 
+    margin-bottom:12px; 
+    box-shadow:0 2px 6px rgba(0,0,0,0.1);
+  }
+  .input-group label { 
+    flex:0 0 100%; 
+    margin-bottom:5px; 
+    font-weight:bold; 
+    color:#333;
+  }
+  .input-group input { 
+    flex:1 1 100%; 
+    font-size:16px;          /* ขยายขนาดตัวอักษร */
+    padding:10px;            /* เพิ่ม padding */
+    border:2px solid #ccc; 
+    border-radius:6px; 
+  }
+  .status-bar { height:16px; }
+  .status-fill { font-size:12px; }
 }
 </style>
 </head>
