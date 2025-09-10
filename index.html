@@ -1,3 +1,4 @@
+<!-- แก้ไข Base Code โปรแกรมสินเชื่อ -->
 <!DOCTYPE html>
 <html lang="th">
 <head>
@@ -11,7 +12,7 @@ body {
   background:#f9f9f9; 
   display:flex; 
   justify-content:center;   /* กึ่งกลางแนวนอน */
-  align-items: flex-start;  /* ชิดด้านบนเสมอ */
+  align-items: flex-start;  /* ชิดด้านบน */
   min-height: 100vh;
 }
 .container { 
@@ -19,7 +20,7 @@ body {
   max-width: 800px; 
   padding:20px; 
   box-sizing: border-box; 
-  text-align: left;
+  margin: 0 auto;           /* กึ่งกลางแนวนอนเสมอ */
 }
 
 label { display: inline-block; width: 200px; }
@@ -32,10 +33,10 @@ button:disabled { background-color: #ccc; cursor: not-allowed; }
 
 .result-wrapper {
   display: none;
-  justify-content: flex-start; /* ชิดบน */
-  align-items: flex-start;     /* ชิดบน */
+  justify-content: center;
+  align-items: flex-start; /* ชิดด้านบน */
   text-align: center;
-  min-height: auto; 
+  width: 100%;
 }
 .result { 
   background: #fff; 
@@ -46,6 +47,7 @@ button:disabled { background-color: #ccc; cursor: not-allowed; }
   width: 100%;
   font-size: 13px; 
   line-height: 1.3; 
+  margin: 0 auto;   /* กึ่งกลางแนวนอน */
 }
 .result h3 { text-align: center; margin-bottom: 8px; font-size: 16px; }
 p.gray { font-size: 11px; color: gray; margin: 2px 0; }
@@ -264,7 +266,7 @@ function calculateLoan() {
     <p>อาจต้องมีการทำประกันสินเชื่อหรือหักเงินฝากค้ำประกัน</p>
     <p>กรุณาติดต่อเจ้าหน้าที่สินเชื่ออีกครั้ง</p>
   `;
-  document.querySelector('.result-wrapper').style.display = 'block'; // ชิดบน
+  document.querySelector('.result-wrapper').style.display = 'flex';
   document.getElementById('printBtn').style.display = 'inline-block';
 }
 </script>
