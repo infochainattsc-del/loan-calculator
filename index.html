@@ -4,14 +4,15 @@
 <meta charset="UTF-8">
 <title>โปรแกรมคำนวณสินเชื่อ</title>
 <style>
+/* --- โครงสร้างหลัก --- */
 body { 
   font-family: "Tahoma", sans-serif; 
   background:#f5f6fa; 
   margin:0; 
   padding:20px; 
   display:flex; 
-  justify-content:center; 
-  align-items:flex-start; 
+  justify-content:center; /* กึ่งกลางแนวนอน */
+  align-items:flex-start; /* เลื่อนตามเนื้อหาแนวตั้ง */
   min-height:100vh;
 }
 .container { 
@@ -22,16 +23,18 @@ body {
   border-radius:12px; 
   box-shadow:0 4px 12px rgba(0,0,0,0.1); 
   box-sizing:border-box; 
+  margin:0 auto; /* กึ่งกลางแนวนอน */
 }
 
-/* โลโก้ + ชื่อโปรแกรม + ชื่อสหกรณ์ บนหน้ากรอกข้อมูล */
+/* โลโก้ + ชื่อโปรแกรม + ชื่อสหกรณ์ */
 .header-display {
   text-align:center; 
   margin-bottom:15px; 
 }
-.header-display img { width:80px; margin-bottom:5px; }
-.header-display h2, .header-display h3 { margin:5px 0; color:#555; }
+.header-display img { width:80px; margin-bottom:5px; max-width:100%; height:auto; }
+.header-display h2, .header-display h3 { margin:5px 0; color:#555; font-size:1rem; }
 
+/* --- ฟอร์ม --- */
 .input-group { margin-bottom:15px; }
 .input-group label { display:block; margin-bottom:4px; font-weight:bold; }
 .input-group input {
@@ -78,7 +81,7 @@ p.warning { color:red; font-weight:bold; display:none; margin:4px 0; }
 /* หัวกระดาษสำหรับพิมพ์ */
 .print-header { display:none; }
 
-/* Print Mode */
+/* --- Print Mode --- */
 @media print {
   body, .container { 
     width:210mm; 
@@ -131,6 +134,14 @@ p.warning { color:red; font-weight:bold; display:none; margin:4px 0; }
   .result th, .result td { padding:10px; text-align:center; }
 
   @page { size:A4; margin:15mm; }
+}
+
+/* --- Responsive มือถือ --- */
+@media (max-width:600px){
+  .container { padding:15px; }
+  .header-display h2, .header-display h3 { font-size:0.9rem; }
+  .input-group input { font-size:13px; padding:8px; }
+  button { font-size:14px; padding:8px; }
 }
 </style>
 </head>
