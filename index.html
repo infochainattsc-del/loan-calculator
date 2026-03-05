@@ -13,6 +13,7 @@
         label { display: block; margin-bottom: 8px; font-weight: bold; color: #34495e; font-size: 15px; }
         input { width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 18px; text-align: right; transition: 0.3s; }
         input:focus { border-color: #3498db; outline: none; background-color: #faffff; }
+        .note { font-size: 13px; color: #7f8c8d; font-weight: normal; margin-left: 5px; }
         button { width: 100%; padding: 15px; background-color: #27ae60; color: white; border: none; border-radius: 8px; font-size: 20px; font-weight: bold; cursor: pointer; transition: 0.3s; margin-top: 15px; }
         button:hover { background-color: #219150; transform: translateY(-2px); }
         .result { margin-top: 25px; padding: 20px; background-color: #f8feff; border: 1px solid #d1f2eb; border-radius: 10px; display: none; box-shadow: inset 0 2px 4px rgba(0,0,0,0.05); }
@@ -41,7 +42,12 @@
 
     <div class="form-group">
         <label>อัตราดอกเบี้ยต่อปี (%)</label>
-        <input type="number" id="interestRate" step="0.01" value="5.5" style="text-align: right;">
+        <input type="number" id="interestRate" step="0.01" value="5" style="text-align: right;">
+    </div>
+
+    <div class="form-group">
+        <label>จำนวนเงินต้นที่ต้องการส่งต่อเดือน (บาท) <span class="note">(หากระบุ ระบบจะคำนวณงวดให้อัตโนมัติ)</span></label>
+        <input type="text" id="principalPerMonth" oninput="formatInput(this)" placeholder="ระบุเงินต้น หรือ ปล่อยว่างไว้">
     </div>
 
     <div class="form-group">
@@ -61,9 +67,9 @@
         <div class="summary-item"><span>เงินกู้รับสุทธิ:</span> <strong id="netReceived" style="color: #27ae60;">0</strong></div>
         
         <div class="summary-item" style="border-bottom: none; margin-bottom: 0;">
-            <span>ค่างวดผ่อนชำระต่อเดือน:</span> <strong id="monthlyPayment" style="color: #e67e22;">0</strong>
+            <span id="paymentLabel">ค่างวดผ่อนชำระ (งวดแรก):</span> <strong id="monthlyPayment" style="color: #e67e22;">0</strong>
         </div>
-        <div class="sub-item"><span>- เป็นเงินต้น (งวดแรก):</span> <span id="firstPrincipal">0</span></div>
+        <div class="sub-item"><span>- เป็นเงินต้น:</span> <span id="firstPrincipal">0</span></div>
         <div class="sub-item"><span>- เป็นดอกเบี้ย (งวดแรก):</span> <span id="firstInterest">0</span></div>
         
         <div class="summary-item" style="margin-top: 10px;"><span>เงินเดือนคงเหลือ:</span> <strong id="remainSalary">0</strong></div>
@@ -90,26 +96,47 @@
         const loan = getCleanNumber('loanAmount');
         const oldDebt = getCleanNumber('oldDebt');
         const annualRate = parseFloat(document.getElementById('interestRate').value) / 100;
-        const months = parseInt(document.getElementById('months').value);
+        let months = parseInt(document.getElementById('months').value) || 0;
         const salary = getCleanNumber('salary');
+        const principalInput = getCleanNumber('principalPerMonth');
 
-        if (loan <= 0 || months <= 0) {
-            alert("กรุณากรอกข้อมูลให้ครบถ้วน");
+        if (loan <= 0) {
+            alert("กรุณากรอกวงเงินกู้ให้ถูกต้อง");
             return;
         }
 
         // 1. เงินกู้รับสุทธิ
         const netReceived = loan - oldDebt;
 
-        // 2. คำนวณค่างวดรวม (PMT)
+        // 2. ดอกเบี้ยงวดแรก (เหมือนกันทั้งสองวิธี)
         const monthlyRate = annualRate / 12;
-        const pmt = (loan * monthlyRate) / (1 - Math.pow(1 + monthlyRate, -months));
+        const interestM1 = loan * monthlyRate; 
 
-        // 3. แยกดอกเบี้ยและเงินต้นของงวดที่ 1
-        const interestM1 = loan * monthlyRate; // ดอกเบี้ย = ต้นคงเหลือ x อัตราดอกเบี้ยรายเดือน
-        const principalM1 = pmt - interestM1; // เงินต้น = ยอดผ่อนรวม - ดอกเบี้ย
+        let principalM1 = 0;
+        let pmt = 0;
 
-        // 4. เงินเดือนคงเหลือ
+        // 3. ตรวจสอบว่าผู้ใช้ระบุเงินต้นต่อเดือนมาหรือไม่
+        if (principalInput > 0) {
+            // กรณีระบุเงินต้น (ส่งแบบสหกรณ์: ต้นคงที่ + ดอกเบี้ยลดลง)
+            principalM1 = principalInput;
+            pmt = principalM1 + interestM1;
+            
+            // คำนวณจำนวนงวดกลับไปที่ช่อง input
+            months = Math.ceil(loan / principalM1);
+            document.getElementById('months').value = months;
+            document.getElementById('paymentLabel').innerText = "ค่างวดผ่อนชำระ (งวดแรก):";
+            
+        } else if (months > 0) {
+            // กรณีระบุแต่จำนวนงวด (ส่งแบบค่างวดเท่ากัน - ผ่อนแบงก์)
+            pmt = (loan * monthlyRate) / (1 - Math.pow(1 + monthlyRate, -months));
+            principalM1 = pmt - interestM1;
+            document.getElementById('paymentLabel').innerText = "ค่างวดผ่อนชำระต่อเดือน:";
+        } else {
+            alert("กรุณาระบุ 'จำนวนเงินต้นที่ต้องการส่งต่อเดือน' หรือ 'จำนวนงวด'");
+            return;
+        }
+
+        // 4. เงินเดือนคงเหลือ (คิดจากยอดส่งงวดแรกที่แพงที่สุด)
         const remainSalary = salary - pmt;
         const salaryPercent = (remainSalary / salary) * 100;
 
