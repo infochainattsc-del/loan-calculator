@@ -56,6 +56,16 @@
     </div>
 
     <div class="form-group">
+        <label>ส่งหุ้นรายเดือน (บาท)</label>
+        <input type="text" id="monthlyShare" oninput="formatInput(this)" placeholder="0" value="0">
+    </div>
+
+    <div class="form-group">
+        <label>เงินฝากรายเดือน (บาท)</label>
+        <input type="text" id="monthlyDeposit" oninput="formatInput(this)" placeholder="0" value="0">
+    </div>
+
+    <div class="form-group">
         <label>เงินเดือนปัจจุบัน (บาท)</label>
         <input type="text" id="salary" oninput="formatInput(this)" placeholder="0" value="30,000">
     </div>
@@ -66,11 +76,15 @@
         <h3>ผลการคำนวณประมาณการ</h3>
         <div class="summary-item"><span>เงินกู้รับสุทธิ:</span> <strong id="netReceived" style="color: #27ae60;">0</strong></div>
         
+        <div class="summary-item"><span>จำนวนงวดที่ต้องผ่อน:</span> <strong id="displayMonths" style="color: #2980b9;">0</strong></div>
+
         <div class="summary-item" style="border-bottom: none; margin-bottom: 0;">
             <span id="paymentLabel">ค่างวดผ่อนชำระ (งวดแรก):</span> <strong id="monthlyPayment" style="color: #e67e22;">0</strong>
         </div>
         <div class="sub-item"><span>- เป็นเงินต้น:</span> <span id="firstPrincipal">0</span></div>
         <div class="sub-item"><span>- เป็นดอกเบี้ย (งวดแรก):</span> <span id="firstInterest">0</span></div>
+        <div class="sub-item" id="shareBox" style="display: none;"><span>- ส่งหุ้นรายเดือน:</span> <span id="shareResult">0</span></div>
+        <div class="sub-item" id="depositBox" style="display: none;"><span>- เงินฝากรายเดือน:</span> <span id="depositResult">0</span></div>
         
         <div class="summary-item" style="margin-top: 10px;"><span>เงินเดือนคงเหลือ:</span> <strong id="remainSalary">0</strong></div>
         <div id="salaryWarning" class="warning"></div>
@@ -99,6 +113,8 @@
         let months = parseInt(document.getElementById('months').value) || 0;
         const salary = getCleanNumber('salary');
         const principalInput = getCleanNumber('principalPerMonth');
+        const monthlyShare = getCleanNumber('monthlyShare');
+        const monthlyDeposit = getCleanNumber('monthlyDeposit');
 
         if (loan <= 0) {
             alert("กรุณากรอกวงเงินกู้ให้ถูกต้อง");
@@ -108,7 +124,7 @@
         // 1. เงินกู้รับสุทธิ
         const netReceived = loan - oldDebt;
 
-        // 2. ดอกเบี้ยงวดแรก (เหมือนกันทั้งสองวิธี)
+        // 2. ดอกเบี้ยงวดแรก 
         const monthlyRate = annualRate / 12;
         const interestM1 = loan * monthlyRate; 
 
@@ -117,17 +133,14 @@
 
         // 3. ตรวจสอบว่าผู้ใช้ระบุเงินต้นต่อเดือนมาหรือไม่
         if (principalInput > 0) {
-            // กรณีระบุเงินต้น (ส่งแบบสหกรณ์: ต้นคงที่ + ดอกเบี้ยลดลง)
             principalM1 = principalInput;
             pmt = principalM1 + interestM1;
             
-            // คำนวณจำนวนงวดกลับไปที่ช่อง input
             months = Math.ceil(loan / principalM1);
             document.getElementById('months').value = months;
             document.getElementById('paymentLabel').innerText = "ค่างวดผ่อนชำระ (งวดแรก):";
             
         } else if (months > 0) {
-            // กรณีระบุแต่จำนวนงวด (ส่งแบบค่างวดเท่ากัน - ผ่อนแบงก์)
             pmt = (loan * monthlyRate) / (1 - Math.pow(1 + monthlyRate, -months));
             principalM1 = pmt - interestM1;
             document.getElementById('paymentLabel').innerText = "ค่างวดผ่อนชำระต่อเดือน:";
@@ -136,19 +149,34 @@
             return;
         }
 
-        // 4. เงินเดือนคงเหลือ (คิดจากยอดส่งงวดแรกที่แพงที่สุด)
-        const remainSalary = salary - pmt;
+        // 4. เงินเดือนคงเหลือ (นำยอดผ่อน, หุ้นรายเดือน และเงินฝากรายเดือนมาหักลบ)
+        const remainSalary = salary - pmt - monthlyShare - monthlyDeposit;
         const salaryPercent = (remainSalary / salary) * 100;
 
         // แสดงผล
         document.getElementById('resultArea').style.display = 'block';
         document.getElementById('netReceived').innerText = netReceived.toLocaleString() + " บาท";
+        document.getElementById('displayMonths').innerText = months.toLocaleString() + " งวด";
         document.getElementById('monthlyPayment').innerText = pmt.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) + " บาท";
         
-        // แสดงค่าแยกต้น-ดอก
+        // แสดงค่าแยกต้น-ดอก, หุ้น และเงินฝาก
         document.getElementById('firstPrincipal').innerText = principalM1.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) + " บาท";
         document.getElementById('firstInterest').innerText = interestM1.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) + " บาท";
         
+        if (monthlyShare > 0) {
+            document.getElementById('shareBox').style.display = 'flex';
+            document.getElementById('shareResult').innerText = monthlyShare.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) + " บาท";
+        } else {
+            document.getElementById('shareBox').style.display = 'none';
+        }
+
+        if (monthlyDeposit > 0) {
+            document.getElementById('depositBox').style.display = 'flex';
+            document.getElementById('depositResult').innerText = monthlyDeposit.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) + " บาท";
+        } else {
+            document.getElementById('depositBox').style.display = 'none';
+        }
+
         document.getElementById('remainSalary').innerText = remainSalary.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) + " บาท (" + salaryPercent.toFixed(2) + "%)";
 
         const warningElem = document.getElementById('salaryWarning');
