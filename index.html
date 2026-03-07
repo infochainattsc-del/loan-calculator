@@ -138,12 +138,12 @@
             
             months = Math.ceil(loan / principalM1);
             document.getElementById('months').value = months;
-            document.getElementById('paymentLabel').innerText = "ค่างวดผ่อนชำระ (งวดแรก):";
+            document.getElementById('paymentLabel').innerText = "ส่งชำระต่อเดือน:";
             
         } else if (months > 0) {
             pmt = (loan * monthlyRate) / (1 - Math.pow(1 + monthlyRate, -months));
             principalM1 = pmt - interestM1;
-            document.getElementById('paymentLabel').innerText = "ค่างวดผ่อนชำระต่อเดือน:";
+            document.getElementById('paymentLabel').innerText = "ส่งชำระต่อเดือน:";
         } else {
             alert("กรุณาระบุ 'จำนวนเงินต้นที่ต้องการส่งต่อเดือน' หรือ 'จำนวนงวด'");
             return;
@@ -191,7 +191,3 @@
 
 </body>
 </html>
-
-
-
-
