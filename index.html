@@ -7,25 +7,24 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;700&display=swap');
         body { font-family: 'Sarabun', sans-serif; background-color: #f0f2f5; display: flex; justify-content: center; padding: 20px; }
-        .container { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 15px 35px rgba(0,0,0,0.1); max-width: 500px; width: 100%; text-align: center; } /* เพิ่ม text-align: center เพื่อจัดโลโก้ */
+        .container { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 15px 35px rgba(0,0,0,0.1); max-width: 500px; width: 100%; text-align: center; } 
         
-        /* สไตล์ใหม่สำหรับโลโก้ */
         .coop-logo {
             display: block;
-            margin: 0 auto 20px; /* จัดกึ่งกลางและเพิ่มระยะห่างด้านล่าง */
-            max-width: 150px; /* จำกัดขนาดโลโก้ */
+            margin: 0 auto 20px; 
+            max-width: 150px; 
             height: auto;
         }
 
         h2 { color: #1a5276; margin-bottom: 25px; border-bottom: 3px solid #3498db; padding-bottom: 10px; margin-top: 0; }
-        .form-group { margin-bottom: 18px; text-align: left; } /* จัดข้อความภายใน form-group ให้ชิดซ้าย */
+        .form-group { margin-bottom: 18px; text-align: left; } 
         label { display: block; margin-bottom: 8px; font-weight: bold; color: #34495e; font-size: 15px; }
         input { width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 18px; text-align: right; transition: 0.3s; }
         input:focus { border-color: #3498db; outline: none; background-color: #faffff; }
         .note { font-size: 13px; color: #7f8c8d; font-weight: normal; margin-left: 5px; }
         button { width: 100%; padding: 15px; background-color: #27ae60; color: white; border: none; border-radius: 8px; font-size: 20px; font-weight: bold; cursor: pointer; transition: 0.3s; margin-top: 15px; }
         button:hover { background-color: #219150; transform: translateY(-2px); }
-        .result { margin-top: 25px; padding: 20px; background-color: #f8feff; border: 1px solid #d1f2eb; border-radius: 10px; display: none; box-shadow: inset 0 2px 4px rgba(0,0,0,0.05); text-align: left; } /* จัดข้อความผลลัพธ์ให้ชิดซ้าย */
+        .result { margin-top: 25px; padding: 20px; background-color: #f8feff; border: 1px solid #d1f2eb; border-radius: 10px; display: none; box-shadow: inset 0 2px 4px rgba(0,0,0,0.05); text-align: left; } 
         .result h3 { margin-top: 0; color: #16a085; border-left: 5px solid #16a085; padding-left: 10px; margin-bottom: 15px; }
         .summary-item { display: flex; justify-content: space-between; margin-bottom: 10px; border-bottom: 1px dashed #bdc3c7; padding-bottom: 8px; font-size: 16px; }
         .summary-item strong { font-size: 18px; }
@@ -33,6 +32,7 @@
         .warning { color: #c0392b; font-size: 14px; margin-top: 12px; font-weight: bold; background: #fdedec; padding: 10px; border-radius: 5px; text-align: center; }
         .highlight { color: #2980b9; font-weight: bold; }
         .total-deduct { background-color: #fef9e7; padding: 10px; border-radius: 8px; margin-top: 10px; margin-bottom: 10px; border: 1px solid #f1c40f; }
+        .other-deduct { background-color: #fbeee6; padding: 8px 10px; border-radius: 8px; margin-bottom: 10px; border: 1px solid #edbb99; font-size: 15px; }
     </style>
 </head>
 <body>
@@ -49,7 +49,7 @@
     </div>
 
     <div class="form-group">
-        <label>รายการหักหนี้เดิม (บาท)</label>
+        <label>หัก รายการหนี้เดิม (บาท)</label>
         <input type="text" id="oldDebt" oninput="formatInput(this)" placeholder="0" value="0">
     </div>
 
@@ -79,6 +79,11 @@
     </div>
 
     <div class="form-group">
+        <label>หัก ค่าใช้จ่ายรายเดือนอื่นๆ (บาท)</label>
+        <input type="text" id="otherExpenses" oninput="formatInput(this)" placeholder="0" value="0">
+    </div>
+
+    <div class="form-group">
         <label>เงินเดือนปัจจุบัน (บาท)</label>
         <input type="text" id="salary" oninput="formatInput(this)" placeholder="0" value="30,000">
     </div>
@@ -88,19 +93,19 @@
     <div id="resultArea" class="result">
         <h3>ผลการคำนวณประมาณการ</h3>
         <div class="summary-item"><span>เงินกู้รับสุทธิ:</span> <strong id="netReceived" style="color: #27ae60;">0</strong></div>
-        
         <div class="summary-item"><span>จำนวนงวดที่ต้องผ่อน:</span> <strong id="displayMonths" style="color: #2980b9;">0</strong></div>
 
-        <div class="summary-item" style="border-bottom: none; margin-bottom: 0;">
-            <span id="paymentLabel">ส่งชำระหนี้/เดือน:</span> <strong id="monthlyPayment" style="color: #e67e22;">0</strong>
-        </div>
-        <div class="sub-item"><span>- เป็นเงินต้น :</span> <span id="firstPrincipal">0</span></div>
-        <div class="sub-item"><span>- เป็นดอกเบี้ย :</span> <span id="firstInterest">0</span></div>
+        <div class="summary-item"><span>เงินต้นส่งชำระ/เดือน:</span> <strong id="firstPrincipal">0</strong></div>
+        <div class="summary-item"><span>ดอกเบี้ยงวดแรก:</span> <strong id="firstInterest">0</strong></div>
         
-        <div class="sub-item" id="shareBox" style="display: none;"><span>- ส่งหุ้น เดือนละ:</span> <span id="shareResult">0</span></div>
-        <div class="sub-item" id="depositBox" style="display: none;"><span>- เงินฝากรายเดือน:</span> <span id="depositResult">0</span></div>
+        <div class="summary-item" id="shareBox" style="display: none;"><span>ส่งหุ้น เดือนละ:</span> <strong id="shareResult">0</strong></div>
+        <div class="summary-item" id="depositBox" style="display: none;"><span>เงินฝากรายเดือน:</span> <strong id="depositResult">0</strong></div>
         
         <div class="summary-item total-deduct"><span>รวมส่งสหกรณ์ต่อเดือน:</span> <strong id="totalCoopDeduct" style="color: #d35400;">0</strong></div>
+
+        <div class="summary-item other-deduct" id="otherExpensesBox" style="display: none;">
+            <span>หัก ค่าใช้จ่ายรายเดือนอื่นๆ:</span> <strong id="otherExpensesResult" style="color: #c0392b;">0</strong>
+        </div>
 
         <div class="summary-item" style="margin-top: 10px;"><span>เงินเดือนคงเหลือ:</span> <strong id="remainSalary">0</strong></div>
         <div id="salaryWarning" class="warning"></div>
@@ -133,6 +138,7 @@
         const principalInput = getCleanNumber('principalPerMonth');
         const monthlyShare = getCleanNumber('monthlyShare');
         const monthlyDeposit = getCleanNumber('monthlyDeposit');
+        const otherExpenses = getCleanNumber('otherExpenses');
 
         if (loan <= 0) {
             alert("กรุณากรอกวงเงินกู้ให้ถูกต้อง");
@@ -153,40 +159,37 @@
         if (principalInput > 0) {
             principalM1 = principalInput;
             pmt = principalM1 + interestM1;
-            
             months = Math.ceil(loan / principalM1);
             document.getElementById('months').value = months;
-            document.getElementById('paymentLabel').innerText = "ส่งชำระหนี้/เดือน:";
             
         } else if (months > 0) {
             pmt = (loan * monthlyRate) / (1 - Math.pow(1 + monthlyRate, -months));
             principalM1 = pmt - interestM1;
-            document.getElementById('paymentLabel').innerText = "ส่งชำระหนี้/เดือน:";
         } else {
             alert("กรุณาระบุ 'จำนวนเงินต้นที่ต้องการส่งต่อเดือน' หรือ 'จำนวนงวด'");
             return;
         }
 
         // คำนวณยอดรวมที่ต้องส่งสหกรณ์ (หนี้ + หุ้น + ฝาก)
-        const totalDeduction = pmt + monthlyShare + monthlyDeposit;
+        const totalCoopDeduction = pmt + monthlyShare + monthlyDeposit;
 
-        // 4. เงินเดือนคงเหลือ (นำเงินเดือน หัก ยอดรวมที่ต้องส่งสหกรณ์)
-        const remainSalary = salary - totalDeduction;
+        // 4. เงินเดือนคงเหลือ (นำเงินเดือน หัก ยอดรวมที่ต้องส่งสหกรณ์ และ ค่าใช้จ่ายอื่นๆ)
+        const remainSalary = salary - totalCoopDeduction - otherExpenses;
         const salaryPercent = (remainSalary / salary) * 100;
 
         // แสดงผล
         document.getElementById('resultArea').style.display = 'block';
         document.getElementById('netReceived').innerText = netReceived.toLocaleString() + " บาท";
         document.getElementById('displayMonths').innerText = months.toLocaleString() + " งวด";
-        document.getElementById('monthlyPayment').innerText = pmt.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) + " บาท";
         
         // แสดงค่ายอดส่งสหกรณ์รวม
-        document.getElementById('totalCoopDeduct').innerText = totalDeduction.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) + " บาท";
+        document.getElementById('totalCoopDeduct').innerText = totalCoopDeduction.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) + " บาท";
 
-        // แสดงค่าแยกต้น-ดอก, หุ้น และเงินฝาก
+        // แสดงค่าแยกต้น-ดอก
         document.getElementById('firstPrincipal').innerText = principalM1.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) + " บาท";
         document.getElementById('firstInterest').innerText = interestM1.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) + " บาท";
         
+        // แสดงหุ้น
         if (monthlyShare > 0) {
             document.getElementById('shareBox').style.display = 'flex';
             document.getElementById('shareResult').innerText = monthlyShare.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) + " บาท";
@@ -194,11 +197,20 @@
             document.getElementById('shareBox').style.display = 'none';
         }
 
+        // แสดงเงินฝาก
         if (monthlyDeposit > 0) {
             document.getElementById('depositBox').style.display = 'flex';
             document.getElementById('depositResult').innerText = monthlyDeposit.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) + " บาท";
         } else {
             document.getElementById('depositBox').style.display = 'none';
+        }
+
+        // แสดงยอดหักค่าใช้จ่ายอื่นๆ (ถ้ามี)
+        if (otherExpenses > 0) {
+            document.getElementById('otherExpensesBox').style.display = 'flex';
+            document.getElementById('otherExpensesResult').innerText = otherExpenses.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) + " บาท";
+        } else {
+            document.getElementById('otherExpensesBox').style.display = 'none';
         }
 
         document.getElementById('remainSalary').innerText = remainSalary.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) + " บาท (" + salaryPercent.toFixed(2) + "%)";
