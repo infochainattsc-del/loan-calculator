@@ -33,6 +33,7 @@
         .highlight { color: #2980b9; font-weight: bold; }
         .total-deduct { background-color: #fef9e7; padding: 10px; border-radius: 8px; margin-top: 10px; margin-bottom: 10px; border: 1px solid #f1c40f; }
         .other-deduct { background-color: #fbeee6; padding: 8px 10px; border-radius: 8px; margin-bottom: 10px; border: 1px solid #edbb99; font-size: 15px; }
+        .disclaimer { font-size: 12px; color: #95a5a6; text-align: center; margin-top: 15px; font-style: italic; }
     </style>
 </head>
 <body>
@@ -85,7 +86,7 @@
 
     <div class="form-group">
         <label>เงินเดือนปัจจุบัน (บาท)</label>
-        <input type="text" id="salary" oninput="formatInput(this)" placeholder="0" value="30,000">
+        <input type="text" id="salary" oninput="formatInput(this)" placeholder="0" value="0">
     </div>
 
     <button onclick="calculateLoan()">เริ่มคำนวณ</button>
@@ -109,6 +110,8 @@
 
         <div class="summary-item" style="margin-top: 10px;"><span>เงินเดือนคงเหลือ:</span> <strong id="remainSalary">0</strong></div>
         <div id="salaryWarning" class="warning"></div>
+        
+        <div class="disclaimer">* หมายเหตุ: ผลการคำนวณนี้เป็นการประมาณการเบื้องต้น (Preliminary Estimate) ตัวเลขจริงอาจมีการเปลี่ยนแปลงเล็กน้อยตามจำนวนวันในแต่ละเดือน</div>
     </div>
 </div>
 
@@ -145,26 +148,42 @@
             return;
         }
 
+        // เช็คป้องกันเงินเดือนเป็น 0 (ป้องกันการหารด้วยศูนย์)
+        if (salary <= 0) {
+            alert("กรุณากรอกเงินเดือนปัจจุบันให้ถูกต้อง เพื่อคำนวณเกณฑ์คงเหลือ");
+            return;
+        }
+
         // 1. เงินกู้รับสุทธิ
         const netReceived = loan - oldDebt;
 
         // 2. ดอกเบี้ยงวดแรก 
         const monthlyRate = annualRate / 12;
-        const interestM1 = loan * monthlyRate; 
+        const rawInterestM1 = loan * monthlyRate; // ดอกเบี้ยดิบก่อนปัดเศษ
+        
+        // ปรับแก้: ปัดเศษทศนิยมขึ้นให้เป็น 0.25, 0.50, 0.75 (ทุก 25 สตางค์) สำหรับดอกเบี้ย
+        const interestM1 = Math.ceil(rawInterestM1 * 4) / 4; 
 
         let principalM1 = 0;
         let pmt = 0;
 
         // 3. ตรวจสอบว่าผู้ใช้ระบุเงินต้นต่อเดือนมาหรือไม่
         if (principalInput > 0) {
-            principalM1 = principalInput;
+            // ปัดเศษขึ้นให้ลงตัวที่ 0.25, 0.50, 0.75 สำหรับเงินต้น
+            principalM1 = Math.ceil(principalInput * 4) / 4;
             pmt = principalM1 + interestM1;
             months = Math.ceil(loan / principalM1);
             document.getElementById('months').value = months;
             
         } else if (months > 0) {
-            pmt = (loan * monthlyRate) / (1 - Math.pow(1 + monthlyRate, -months));
-            principalM1 = pmt - interestM1;
+            let exactPmt = (loan * monthlyRate) / (1 - Math.pow(1 + monthlyRate, -months));
+            let exactPrincipal = exactPmt - rawInterestM1; // หักดอกเบี้ยดิบเพื่อหาเงินต้นที่แท้จริงก่อน
+            
+            // ปัดเศษทศนิยมขึ้นให้เป็น 0.25, 0.50, 0.75 (ทุก 25 สตางค์) เฉพาะเงินต้น
+            principalM1 = Math.ceil(exactPrincipal * 4) / 4; 
+            
+            // ค่างวด (PMT) คำนวณจากเงินต้นที่ปัดเศษแล้วรวมกับดอกเบี้ยที่ปัดเศษแล้ว
+            pmt = principalM1 + interestM1;
         } else {
             alert("กรุณาระบุ 'จำนวนเงินต้นที่ต้องการส่งต่อเดือน' หรือ 'จำนวนงวด'");
             return;
@@ -179,7 +198,7 @@
 
         // แสดงผล
         document.getElementById('resultArea').style.display = 'block';
-        document.getElementById('netReceived').innerText = netReceived.toLocaleString() + " บาท";
+        document.getElementById('netReceived').innerText = netReceived.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) + " บาท";
         document.getElementById('displayMonths').innerText = months.toLocaleString() + " งวด";
         
         // แสดงค่ายอดส่งสหกรณ์รวม
