@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>โปรแกรมคำนวณเงินกู้ สอ.ครูชัยนาท (ฉบับแยกต้น-ดอก)</title>
+    <title>โปรแกรมคำนวณเงินกู้ สอ.ครูชัยนาท จำกัด v.2569-04-17</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;700&display=swap');
         body { font-family: 'Sarabun', sans-serif; background-color: #f0f2f5; display: flex; justify-content: center; padding: 20px; }
@@ -41,7 +41,7 @@
 <div class="container">
     <img src="https://www.chainattsc.com/mediafiles/picture/CTSC.png" alt="โลโก้ สอ.ครูชัยนาท" class="coop-logo">
     
-    <h2>โปรแกรมคำนวณเงินกู้<br>
+    <h2>โปรแกรมคำนวณเงินกู้ v.2569-04-17<br>
     สหกรณ์ออมทรัพย์ครูชัยนาท จำกัด</h2>
     
     <div class="form-group">
@@ -60,7 +60,7 @@
     </div>
 
     <div class="form-group">
-        <label>จำนวนเงินต้นที่ต้องการส่งต่อเดือน (บาท) <span class="note">(หากระบุ ระบบจะคำนวณงวดให้อัตโนมัติ)</span></label>
+        <label>จำนวนเงินต้นที่ต้องการส่งต่อเดือน (บาท) <span class="note">(จะถูกปัดขึ้นเป็นเต็มร้อย)</span></label>
         <input type="text" id="principalPerMonth" oninput="formatInput(this)" placeholder="ระบุเงินต้น หรือ ปล่อยว่างไว้">
     </div>
 
@@ -111,14 +111,16 @@
         <div class="summary-item" style="margin-top: 10px;"><span>เงินเดือนคงเหลือ:</span> <strong id="remainSalary">0</strong></div>
         <div id="salaryWarning" class="warning"></div>
         
-        <div class="disclaimer">* หมายเหตุ: ผลการคำนวณนี้เป็นการประมาณการเบื้องต้น (Preliminary Estimate) ตัวเลขจริงอาจมีการเปลี่ยนแปลงเล็กน้อยตามจำนวนวันในแต่ละเดือน</div>
+        <div class="disclaimer">* หมายเหตุ: ยอดเงินต้นถูกปัดขึ้นเป็นจำนวนเต็ม 100 เพื่อความสะดวกในการบริหารจัดการ และผลการคำนวณนี้เป็นการประมาณการเบื้องต้น</div>
     </div>
 </div>
 
 <script>
+    /**
+     * ฟังก์ชันจัดรูปแบบตัวเลข (Comma Separated) ขณะพิมพ์
+     */
     function formatInput(input) {
         let value = input.value.replace(/,/g, '');
-        // ตรวจสอบว่าเป็นตัวเลข (Numbers) เท่านั้น
         if (!isNaN(value) && value !== "") {
             input.value = Number(value).toLocaleString('en-US');
         } else {
@@ -126,13 +128,19 @@
         }
     }
 
+    /**
+     * ฟังก์ชันดึงค่าตัวเลขออกจาก String ที่มี Comma
+     */
     function getCleanNumber(id) {
         let val = document.getElementById(id).value.replace(/,/g, '');
-        // แปลงข้อความให้เป็นตัวเลขทศนิยม (Float)
         return parseFloat(val) || 0;
     }
 
+    /**
+     * ฟังก์ชันหลักในการคำนวณเงินกู้
+     */
     function calculateLoan() {
+        // ดึงค่า Input
         const loan = getCleanNumber('loanAmount');
         const oldDebt = getCleanNumber('oldDebt');
         const annualRate = parseFloat(document.getElementById('interestRate').value) / 100;
@@ -143,72 +151,70 @@
         const monthlyDeposit = getCleanNumber('monthlyDeposit');
         const otherExpenses = getCleanNumber('otherExpenses');
 
+        // Validation ขั้นต้น
         if (loan <= 0) {
             alert("กรุณากรอกวงเงินกู้ให้ถูกต้อง");
             return;
         }
 
-        // เช็คป้องกันเงินเดือนเป็น 0 (ป้องกันการหารด้วยศูนย์)
         if (salary <= 0) {
-            alert("กรุณากรอกเงินเดือนปัจจุบันให้ถูกต้อง เพื่อคำนวณเกณฑ์คงเหลือ");
+            alert("กรุณากรอกเงินเดือนปัจจุบัน เพื่อใช้ในการคำนวณเกณฑ์คงเหลือตามระเบียบ");
             return;
         }
 
-        // 1. เงินกู้รับสุทธิ
+        // 1. คำนวณเงินกู้รับสุทธิ
         const netReceived = loan - oldDebt;
 
-        // 2. ดอกเบี้ยงวดแรก 
+        // 2. คำนวณดอกเบี้ยงวดแรก (อัตราต่อเดือน)
         const monthlyRate = annualRate / 12;
-        const rawInterestM1 = loan * monthlyRate; // ดอกเบี้ยดิบก่อนปัดเศษ
-        
-        // ปรับแก้: ปัดเศษทศนิยมขึ้นให้เป็น 0.25, 0.50, 0.75 (ทุก 25 สตางค์) สำหรับดอกเบี้ย
+        const rawInterestM1 = loan * monthlyRate; 
+        // ปรับเศษดอกเบี้ยขึ้นทุก 25 สตางค์ตามมาตรฐานระบบสหกรณ์
         const interestM1 = Math.ceil(rawInterestM1 * 4) / 4; 
 
         let principalM1 = 0;
         let pmt = 0;
 
-        // 3. ตรวจสอบว่าผู้ใช้ระบุเงินต้นต่อเดือนมาหรือไม่
+        // 3. ตรรกะการคำนวณเงินต้นแบบปัดเศษเต็มร้อย (Ceiling to nearest 100)
         if (principalInput > 0) {
-            // ปัดเศษขึ้นให้ลงตัวที่ 0.25, 0.50, 0.75 สำหรับเงินต้น
-            principalM1 = Math.ceil(principalInput * 4) / 4;
+            // กรณีระบุเงินต้นเอง: ปัดเศษขึ้นให้เต็ม 100 ทันที
+            principalM1 = Math.ceil(principalInput / 100) * 100;
             pmt = principalM1 + interestM1;
             months = Math.ceil(loan / principalM1);
             document.getElementById('months').value = months;
             
         } else if (months > 0) {
+            // กรณีระบุจำนวนงวด: คำนวณค่างวดแบบ PMT แล้วแยกส่วนเงินต้นออกมาปัดเศษ
             let exactPmt = (loan * monthlyRate) / (1 - Math.pow(1 + monthlyRate, -months));
-            let exactPrincipal = exactPmt - rawInterestM1; // หักดอกเบี้ยดิบเพื่อหาเงินต้นที่แท้จริงก่อน
+            let exactPrincipal = exactPmt - rawInterestM1; 
             
-            // ปัดเศษทศนิยมขึ้นให้เป็น 0.25, 0.50, 0.75 (ทุก 25 สตางค์) เฉพาะเงินต้น
-            principalM1 = Math.ceil(exactPrincipal * 4) / 4; 
+            // ปัดเศษเงินต้นขึ้นเป็นจำนวนเต็ม 100 (เช่น 4,120.50 -> 4,200.00)
+            principalM1 = Math.ceil(exactPrincipal / 100) * 100; 
             
-            // ค่างวด (PMT) คำนวณจากเงินต้นที่ปัดเศษแล้วรวมกับดอกเบี้ยที่ปัดเศษแล้ว
+            // ยอดชำระรวมรายเดือน (PMT) = เงินต้น(ปัดเศษ) + ดอกเบี้ย(ปัดเศษสตางค์)
             pmt = principalM1 + interestM1;
         } else {
             alert("กรุณาระบุ 'จำนวนเงินต้นที่ต้องการส่งต่อเดือน' หรือ 'จำนวนงวด'");
             return;
         }
 
-        // คำนวณยอดรวมที่ต้องส่งสหกรณ์ (หนี้ + หุ้น + ฝาก)
+        // 4. คำนวณภาระหนี้รวมต่อเดือนและเกณฑ์เงินเดือนคงเหลือ
         const totalCoopDeduction = pmt + monthlyShare + monthlyDeposit;
-
-        // 4. เงินเดือนคงเหลือ (นำเงินเดือน หัก ยอดรวมที่ต้องส่งสหกรณ์ และ ค่าใช้จ่ายอื่นๆ)
         const remainSalary = salary - totalCoopDeduction - otherExpenses;
         const salaryPercent = (remainSalary / salary) * 100;
 
-        // แสดงผล
+        // 5. แสดงผลลัพธ์ผ่าน UI
         document.getElementById('resultArea').style.display = 'block';
+        
+        // ยอดรับสุทธิและงวด
         document.getElementById('netReceived').innerText = netReceived.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) + " บาท";
         document.getElementById('displayMonths').innerText = months.toLocaleString() + " งวด";
-        
-        // แสดงค่ายอดส่งสหกรณ์รวม
-        document.getElementById('totalCoopDeduct').innerText = totalCoopDeduction.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) + " บาท";
 
-        // แสดงค่าแยกต้น-ดอก
+        // รายละเอียดการชำระ
         document.getElementById('firstPrincipal').innerText = principalM1.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) + " บาท";
         document.getElementById('firstInterest').innerText = interestM1.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) + " บาท";
-        
-        // แสดงหุ้น
+        document.getElementById('totalCoopDeduct').innerText = totalCoopDeduction.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) + " บาท";
+
+        // ส่วนแสดงหุ้น (Share)
         if (monthlyShare > 0) {
             document.getElementById('shareBox').style.display = 'flex';
             document.getElementById('shareResult').innerText = monthlyShare.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) + " บาท";
@@ -216,7 +222,7 @@
             document.getElementById('shareBox').style.display = 'none';
         }
 
-        // แสดงเงินฝาก
+        // ส่วนแสดงเงินฝาก (Deposit)
         if (monthlyDeposit > 0) {
             document.getElementById('depositBox').style.display = 'flex';
             document.getElementById('depositResult').innerText = monthlyDeposit.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) + " บาท";
@@ -224,7 +230,7 @@
             document.getElementById('depositBox').style.display = 'none';
         }
 
-        // แสดงยอดหักค่าใช้จ่ายอื่นๆ (ถ้ามี)
+        // ส่วนแสดงค่าใช้จ่ายอื่นๆ
         if (otherExpenses > 0) {
             document.getElementById('otherExpensesBox').style.display = 'flex';
             document.getElementById('otherExpensesResult').innerText = otherExpenses.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) + " บาท";
@@ -232,15 +238,20 @@
             document.getElementById('otherExpensesBox').style.display = 'none';
         }
 
+        // เงินเดือนคงเหลือ
         document.getElementById('remainSalary').innerText = remainSalary.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) + " บาท (" + salaryPercent.toFixed(2) + "%)";
 
+        // การแจ้งเตือนตามเกณฑ์ 30%
         const warningElem = document.getElementById('salaryWarning');
         if (salaryPercent < 30) {
             warningElem.style.display = 'block';
-            warningElem.innerText = "⚠️ เงินเดือนเหลือต่ำกว่า 30% อาจไม่เป็นไปตามระเบียบ";
+            warningElem.innerText = "⚠️ คำเตือน: เงินเดือนคงเหลือต่ำกว่า 30% (" + salaryPercent.toFixed(2) + "%) อาจไม่ผ่านเกณฑ์พิจารณาตามระเบียบ";
         } else {
             warningElem.style.display = 'none';
         }
+
+        // เลื่อนหน้าจอลงมาที่ผลลัพธ์เพื่อให้เห็นชัดเจน (UX Improvement)
+        document.getElementById('resultArea').scrollIntoView({ behavior: 'smooth' });
     }
 </script>
 
